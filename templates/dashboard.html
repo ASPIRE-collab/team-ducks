@@ -1,198 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
-    
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="static/js/materialize.min.js"> -->
-    <!-- <script src="/opt/ohkay-owingeh-api/static/js/materialize.min.js"></script> -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
+
 <body>
-    <ul id="user_dropdown" class="dropdown-content">
-      {% if user_info.is_admin == True %} <li><a href="/admin/">Admin</a></li>{% endif %}
-      
-      <!-- <li><a href="#!">two</a></li> -->
-      <li class="divider"></li>
-      <li><a href="/admin/logout">logout</a></li>
-    </ul>
+  <ul id="user_dropdown" class="dropdown-content">
+    {% if user_info.is_admin == True %} <li><a href="/admin/">Admin</a></li>{% endif %}
 
-    <nav class="theme-color" role="navigation">
-      <div class="nav-wrapper container">
-        <a id="logo-container" href="#" class="brand-logo">
-          LEWIS Network API
-          <!-- <img id='nav-image' src="{{ url_for('static', filename='images/EDAC_UNM_logo_Dark_background_right_alligned_text.svg') }}" alt="EDAC"> -->
-        </a>
-        <ul class="right hide-on-med-and-down">
-          <li><a class="dropdown-trigger" href="#!" data-target="user_dropdown">{{user_info['last_name']}}, {{user_info['first_name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
-        </ul>
+    <li class="divider"></li>
+    <li><a href="/admin/logout">logout</a></li>
+  </ul>
 
-        <!-- <ul id="nav-mobile" class="sidenav">
-          <li><a class="dropdown-trigger" href="#!" data-target="user_dropdown">Dropdown<i class="material-icons right">arrow_drop_down</i></a></li>
-        </ul>
-        <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a> -->
-      </div>
-    </nav>
-  
-    <!-- <div class="section no-pad-bot" id="index-banner">
-      <div class="container">
-        <br><br>
-        <h1 class="header center" style="color: #3687a3">Welcome, {{ user_info.first_name }}!</h1>
-      </div>
+  <nav class="theme-color" role="navigation">
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="#" class="brand-logo">
+        Drones For Ducks
+      </a>
+      <ul class="right hide-on-med-and-down">
+        <li><a class="dropdown-trigger" href="#!" data-target="user_dropdown">{{user_info['last_name']}},
+            {{user_info['first_name']}}<i class="material-icons right">arrow_drop_down</i></a></li>
+      </ul>
+
+
     </div>
-   -->
-    
-    <div class="container">
-      <div class="row">
-        {% if user_info.is_admin == True %}<div class="col s4 m4"> {% else %} <div class="col s6 m6"></div>{% endif %}
-          <div class="card hoverable block-data-viewer">
-            <div class="card-content center-align">
-              <span class="card-title">Sensors</span>
-            </div>
-            <div class="card-image center-align">
-              <i class="large material-icons">assignment</i>
-            </div>
-            <div class="card-action center-align">
-              <a onClick='showpage("/data_entry");' class="green waves-effect waves-light btn-small">Sensors</a>
-            </div>
-          </div>
-        </div>
-        {% if user_info.is_admin == True %}<div class="col s4 m4"> {% else %} <div class="col s6 m6"></div>{% endif %}
-          <div class="card hoverable admin-only">
-            <div class="card-content center-align">
-              <span class="card-title">Analytics</span>
-            </div>
-            <div class="card-image center-align">
-              <i class="large material-icons">insights</i>
-              <!-- <i class="large material-icons">analytics</i> -->
-            </div>
-            <div class="card-action center-align">
-              <a onClick='showpage("/analytics");' class="green waves-effect waves-light btn-small">Analytics</a>
-            </div>
-          </div>
-        </div>
-      <!-- <div class="row">
-        <div class="col s3 m3">
-          <div class="card hoverable admin-only block-data-viewer">
-            <div class="card-content center-align">
-              <span class="card-title">QAQC</span>
-              <p>There is currently <b>{{qaqc}} form(s)</b> available for review</p>
-              <p>Short Description of Dashboard option here.</p>
-            </div>
-            <div class="card-image center-align">
-              <i class="large material-icons">description</i>
-            </div>
-            <div class="card-action center-align">
-              <a onClick='showpage("/qaqc");' class="green waves-effect waves-light btn-small">QAQC</a>
-            </div>
-          </div>
-        </div>
-        <div class="col s3 m3">
-          <div class="card hoverable admin-only block-data-viewer">
-            <div class="card-content center-align">
-              <span class="card-title">Edit Data</span>
-              <p>Modify reference or observed data.</p>
-            </div>
-            <div class="card-image center-align">
-              <i class="large material-icons">edit</i>
-            </div>
-            <div class="card-action center-align">
-              <a onClick='showpage("/edit_data/edit_dashboard.html");'
-                class="green waves-effect waves-light btn-small">Edit</a>
-            </div>
-          </div>
-        </div>
-        <div class="col s3 m3">
-          <div class="card hoverable admin-only block-data-viewer">
-            <div class="card-content center-align">
-              <span class="card-title">Add Data</span>
-              <p>Add reference data.</p>
-            </div>
-            <div class="card-image center-align">
-              <i class="large material-icons">add_box</i>
-            </div>
-            <div class="card-action center-align">
-              <a onClick='showpage("/edit_data/add_dashboard.html");' class="green waves-effect waves-light btn-small">Add</a>
-            </div>
-          </div>
-        </div>
-        <div class="col s3 m3">
-          <div class="card hoverable admin-only block-data-viewer">
-            <div class="card-content center-align">
-              <span class="card-title">System Settings</span>
-              <p>General System Settings</p>
-            </div>
-            <div class="card-image center-align">
-              <i class="large material-icons">settings</i>
-            </div>
-            <div class="card-action center-align">
-              <a onClick='showpage("/settings");' class="green waves-effect waves-light btn-small">Settings</a>
-            </div>
-          </div>
-        </div>
-      </div> -->
-      
-        </div>
-  
-      </div>
-      <br><br>
+  </nav>
+
+
+
+  <div class="container">
+    <div class="row">
+
     </div>
-  
-    <!-- <footer class="page-footer orange">
-      <div class="container">
-        <div class="row">
-          <div class="col l6 s12">
-            <h5 class="white-text">Company Bio</h5>
-            <p class="grey-text text-lighten-4">We are a team of college students working on this project like it's our full time job. Any amount would help support and continue development on this project and is greatly appreciated.</p>
-  
-  
-          </div>
-          <div class="col l3 s12">
-            <h5 class="white-text">Settings</h5>
-            <ul>
-              <li><a class="white-text" href="#!">Link 1</a></li>
-              <li><a class="white-text" href="#!">Link 2</a></li>
-              <li><a class="white-text" href="#!">Link 3</a></li>
-              <li><a class="white-text" href="#!">Link 4</a></li>
-            </ul>
-          </div>
-          <div class="col l3 s12">
-            <h5 class="white-text">Connect</h5>
-            <ul>
-              <li><a class="white-text" href="#!">Link 1</a></li>
-              <li><a class="white-text" href="#!">Link 2</a></li>
-              <li><a class="white-text" href="#!">Link 3</a></li>
-              <li><a class="white-text" href="#!">Link 4</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="footer-copyright">
-        <div class="container">
-        Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
-        </div>
-      </div>
-    </footer> -->
-  
-  
-    <!--  Scripts-->
-    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
-    <!-- <script src="js/init.js"></script> -->
-    <script>
-      $(document).ready(function(){
-        $(".dropdown-trigger").dropdown();
-      });
-    
-    
-    </script>
-  
+
+  </div>
+  <br><br>
+  </div>
+
+
+
+  <!--  Scripts-->
+  <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+  <!-- <script src="js/init.js"></script> -->
+  <script>
+    $(document).ready(function () {
+      $(".dropdown-trigger").dropdown();
+    });
+
+
+  </script>
+
 </body>
 
 </html>
-

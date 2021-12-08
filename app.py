@@ -1,7 +1,6 @@
 from flask import Flask,render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 app = Flask(__name__)
 app.config.from_object('config.DevConfig')
 
@@ -27,7 +26,5 @@ app.register_blueprint(admin_bp,url_prefix='/admin')
 
 @app.route("/" , methods=['GET', 'POST']) 
 def root():
-    return render_template('index.html')
+    return render_template('index.html' , is_authenticated=current_user.is_authenticated)
 
-# You can register new blueprints in this file, but no new routes should be created in this file. 
-# All routes should be created from blueprints in the views directory.

@@ -271,7 +271,7 @@ def create_user():
             role = request.form['role']
             user = db.session.query(User).filter(User.email == email).first()
         
-            headertitle='Set your API password.'
+            headertitle='Set your Drones for Ducks password.'
             blurb='An API account has been created for you. Before you log in you must change your password.'
             if user:
                 error_string="User with email:"+email+" exists."
@@ -360,7 +360,7 @@ def login():
                 salted_hash = hashlib.sha256(string.encode()).hexdigest()
                 if salted_hash == user.user_hash:
                     login_user(user)
-                    return redirect(url_for('dashboard_bp.dashboard'))
+                    return redirect(url_for('root'))
                 else:
                     return render_template('general_error.html',error_string='Login Failed.')
             else:
@@ -385,7 +385,7 @@ def password_reset_request():
         if user_row:
             #This if is used to prevent any sql shenanigans
             if user_row.email==email:
-                headertitle='Change your API password.'
+                headertitle='Change your Drones for Ducks password.'
                 blurb='A request was made for a password reset link. If you did not request this, please disregard.'
                 send_password_reset_email(user_row,headertitle,blurb)
                 return render_template('general_message.html',error_string='An e-mail has been set to '+email)
@@ -407,7 +407,7 @@ def logout():
     """
     current_app.logger.info("User ID:"+str(current_user.id)+" Email:"+current_user.email+" has logged out.")
     logout_user()
-    return redirect(url_for('admin_bp.login'))
+    return redirect(url_for('root'))
 
 
 @login_manager.user_loader
