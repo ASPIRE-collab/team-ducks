@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="static/js/materialize.min.js"> -->
+    <!-- <script src="/opt/ohkay-owingeh-api/static/js/materialize.min.js"></script> -->
+</head>
+<body>
+    <ul id="user_dropdown" class="dropdown-content">
+      <!-- <li><a href="#!">one</a></li>
+      <li><a href="#!">two</a></li> -->
+      <!-- <li class="divider"></li> -->
+      <li><a href="/admin/logout">logout</a></li>
+    </ul>
+
+
+    
+    <div class="container">
+        <div class="row">
+            <div class="col s4 m4">
+                <div class="card hoverable admin-only block-data-viewer">
+                    <div class="card-content center-align">
+                        <span class="card-title">Create User</span>
+                        <p style="color:white">_</p>
+                    </div>
+                    <div class="card-image center-align">
+                        <i class="large material-icons">add_person</i>
+                    </div>
+                    <div class="card-action center-align">
+                        <a href="/admin/create_user" class="green waves-effect waves-light btn-small">Create</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col s4 m4">
+                <div class="card hoverable admin-only block-data-viewer">
+                    <div class="card-content center-align">
+                        <span class="card-title">Edit Users</span>
+                        <p style="color:white">_</p>
+                    </div>
+                    <div class="card-image center-align">
+                        <i class="large material-icons">manage_accounts</i>
+                    </div>
+                    <div class="card-action center-align">
+                        <a href="/admin/edit_users" class="green waves-effect waves-light btn-small">Edit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+    <!--  Scripts-->
+    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+    <!-- <script src="js/init.js"></script> -->
+    <script>
+      $(document).ready(function(){
+        $(".dropdown-trigger").dropdown();
+      });
+    
+    
+    </script>
+  
+</body>
+
+</html>

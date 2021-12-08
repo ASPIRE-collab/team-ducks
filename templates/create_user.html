@@ -1,0 +1,56 @@
+<html class="height_100p">
+
+<head>
+    <link rel="stylesheet" href="/static/css/materialize.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/static/js/jquery-3.6.0.min.js"></script>
+    <script src="/static/js/materialize.min.js"></script>
+</head>
+
+<body class="height_100p">
+    <div class='height_10p center-block'></div>
+    <div class='height_10p center-block'></div>
+    <div class="row ">
+        <div class="col s12 m4 push-m4">
+            <div class="card">
+                <form action='create_user' method='POST'>
+                    <div class="card-content">
+                        <div class="row input-field">
+                            <input type='text' name='first_name' id='first_name' class='validate' required />
+                            <label for="first_name">First Name</label>
+                        </div>
+                        <div class="row input-field">
+                            <input type='text' name='last_name' id='last_name' class='validate' required />
+                            <label for="last_name">Last Name</label>
+                        </div>
+                        <div class="row input-field">
+                            <input type='email' name='email' id='email' class='validate' required />
+                            <span class="helper-text" data-error="please enter valid email" data-success=""></span>
+                            <label for="email">Email</label>
+                        </div>
+                        <label for="role">Primary Role:</label>
+                        <select name="role" id="role">
+                        {% for role in roles_object.roles %}
+                            <option value="{{role.id}}">{{role.role_name}}</option>
+                        {% endfor %}
+                        </select>
+
+
+                    </div>
+                    <div class="card-action right-align">
+
+                        <button type="submit" class="blue waves-effect waves-light btn-small" value="create_user">Create
+                            User</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function(){
+        $('select').formSelect();
+      });
+</script>

@@ -1,0 +1,156 @@
+.height_100p{
+    height: 100%;
+  }
+.height_33p{
+    height: 33%;
+}
+.height_10p{
+    height: 10%;
+}
+
+.height_5p{
+    height: 5%;
+}
+
+
+.btn, .btn-large, .btn-small {
+
+    color: #fff;
+    background-color: #3687a3  !important;
+
+}
+
+.color{
+    color: #3687a3;
+}
+
+.error_text{
+    color: #b61e1e;
+    
+}
+
+.h2ln{
+    line-height: 2em;
+    
+}
+
+.error_flex{
+    display: flex;
+align-items: center;
+justify-content: center;
+}
+
+input.valid:not([type]), input.valid:not([type]):focus, input.valid[type=text]:not(.browser-default), input.valid[type=text]:not(.browser-default):focus, input.valid[type=password]:not(.browser-default), input.valid[type=password]:not(.browser-default):focus, input.valid[type=email]:not(.browser-default), input.valid[type=email]:not(.browser-default):focus, input.valid[type=url]:not(.browser-default), input.valid[type=url]:not(.browser-default):focus, input.valid[type=time]:not(.browser-default), input.valid[type=time]:not(.browser-default):focus, input.valid[type=date]:not(.browser-default), input.valid[type=date]:not(.browser-default):focus, input.valid[type=datetime]:not(.browser-default), input.valid[type=datetime]:not(.browser-default):focus, input.valid[type=datetime-local]:not(.browser-default), input.valid[type=datetime-local]:not(.browser-default):focus, input.valid[type=tel]:not(.browser-default), input.valid[type=tel]:not(.browser-default):focus, input.valid[type=number]:not(.browser-default), input.valid[type=number]:not(.browser-default):focus, input.valid[type=search]:not(.browser-default), input.valid[type=search]:not(.browser-default):focus, textarea.materialize-textarea.valid, textarea.materialize-textarea.valid:focus, .select-wrapper.valid>input.select-dropdown {
+    border-bottom: 1px solid #3687a3;
+    -webkit-box-shadow: 0 1px 0 0 #3687a3;
+    box-shadow: 0 1px 0 0 #3687a3;
+}
+
+[type="checkbox"].filled-in:checked+span:not(.lever):after {
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #3687a3;
+    background-color: #3687a3;
+    z-index: 0;
+}
+
+[type="checkbox"]:checked+span:not(.lever):before {
+    top: -4px;
+    left: -5px;
+    width: 12px;
+    height: 22px;
+    border-top: 2px solid transparent;
+    border-left: 2px solid transparent;
+    border-right: 2px solid #3687a3;
+    border-bottom: 2px solid #3687a3;
+    -webkit-transform: rotate(
+40deg);
+    transform: rotate(
+40deg);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-origin: 100% 100%;
+    transform-origin: 100% 100%;
+}
+
+.collection a.collection-item {
+    display: block;
+    -webkit-transition: .25s;
+    transition: .25s;
+    color: #3687a3;
+}
+
+#toast-container {
+    top: auto !important;
+    right: auto !important;
+    bottom: 50%;
+    left:40%;  
+  }
+
+  .theme-color {
+      background-color: #3687a3;
+  }
+
+  .navbar-unm {
+    background-color: #ba0c2f;
+    border-color: #8a0923;
+    font-size: 13px;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.outer-nav {
+    line-height: 1.75;
+    height: 27px;
+}
+
+.navbar-brand {
+    margin-left: 17%;
+    background: #FFF;
+    color: #fff;
+    position: absolute;
+    border-bottom: 3px solid #ba0c2f;
+    background-image: url(//webcore.unm.edu/v2/images/unm-logo.png);
+    text-indent: -999px;
+    width: 235px;
+    background-repeat: no-repeat;
+    height: 70px;
+    background-position-x: 50%;
+    background-position-y: 50%;
+    z-index: 100;
+    padding: 0;
+    background-size: contain;
+    top: -1px;
+}
+
+@font-face {
+    font-family:"vitessesans";
+    src: url("/static/fonts/vitessesans-medium.otf") format("opentype");
+  }
+
+
+.title{
+    font-family: vitessesans;
+    font-size: 36px;
+}
+
+.blurb_text{
+
+font-size: 13pt;
+}
+
+.arrow_drop_down{
+    height: 11px !important;
+    line-height: 27px !important;
+    margin-left: 0px !important;
+}
+
+.dropdown-top{
+    top: 27px !important;
+}
+
+.dropdown-text{
+    
+    color: rgba(0,0,0,0.87) !important;
+}

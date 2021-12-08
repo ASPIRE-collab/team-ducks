@@ -1,0 +1,128 @@
+<html class="height_100p">
+
+<head>
+    <link rel="stylesheet" href="/static/css/materialize.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/static/js/jquery-3.6.0.min.js"></script>
+    <script src="/static/js/materialize.min.js"></script>
+</head>
+
+<body class="height_100p">
+    <div class='height_10p center-block'></div>
+    <div class='height_10p center-block'></div>
+    <div class="card-action center-align">
+        <a href="/admin/create_user" class="green waves-effect waves-light btn-small">Create User</a>
+    </div>
+    <div class="row">
+        <div class="input-field col s4"></div>
+        <div class="input-field col s4">
+            <ul class="collapsible">
+                {% for user in user_obj['users'] %}
+                <li>
+                    {% if user['active'] == True %}
+                    <div class="collapsible-header">{{user.first_name}} {{user.last_name}} ({{user.email}}) </div>
+                    {% else %}
+                    <div class="collapsible-header" style="color:rgb(187, 187, 187)">{{user.first_name}}
+                        {{user.last_name}} ({{user.email}}) </div>
+                    {% endif %}
+                    <div class="collapsible-body">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="first_name_{{user.id}}" type="text" class="validate"
+                                    value="{{user.first_name}}">
+                                <label for="first_name_{{user.id}}">First Name</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="last_name_{{user.id}}" type="text" class="validate"
+                                    value="{{user.last_name}}">
+                                <label for="last_name_{{user.id}}">Last Name</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="email_{{user.id}}" type="text" class="validate" value="{{user.email}}">
+                                <label for="email_{{user.id}}">E-Mail</label>
+                            </div>
+
+
+                            <div class="input-field col s6">
+                                <select id="role_{{user.id}}" multiple>
+                                    {% for role in role_obj['roles'] %}
+                                    {% if role.id in user['role_ids']%}
+                                    <option value="{{role.id}}" selected>{{role.role_name}}</option>
+                                    {% else %}
+                                    <option value="{{role.id}}">{{role.role_name}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <label>Roles</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <label>
+                                    {% if user['active'] == True %}
+                                    <input id="active_{{user.id}}" type="checkbox" class="filled-in"
+                                        checked="checked" />
+                                    {% else %}
+                                    <input id="active_{{user.id}}" type="checkbox" class="filled-in" />
+                                    {% endif %}
+                                    <span>Enabled</span>
+                                </label>
+                            </div>
+                            <div class="input-field col s6">
+                                <a onclick="save_user({{user.id}});" class="greenwaves-effect waves-light btn">Save</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="input-field col s4"></div>
+    </div>
+</body>
+
+</html>
+
+
+<script>
+    $(document).ready(function () {
+        $('.collapsible').collapsible();
+        $('select').formSelect();
+        M.updateTextFields();
+
+    });
+
+    function save_user(id) {
+        instance = M.FormSelect.getInstance($("#role_" + id));
+        post_json = {
+            'id': id,
+            'email': $("#email_" + id).val(),
+            'first_name': $("#first_name_" + id).val(),
+            'last_name': $("#last_name_" + id).val(),
+            'active': $('#active_' + id).is(":checked"),
+            'roles': instance.getSelectedValues()
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "edit_users",
+            data: JSON.stringify(post_json),
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.status == "success") {
+                    M.toast({ html: 'Updated user:' + post_json['email'], classes: 'rounded button-green' });
+
+                } else {
+                    M.toast({ html: 'Update Failed!!', classes: 'rounded button-red' });
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                M.toast({ html: 'Update Failed!!', classes: 'rounded button-red' });
+            }
+        });
+
+
+    }
+</script>

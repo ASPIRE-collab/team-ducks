@@ -1,0 +1,86 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/materialize.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/static/js/jquery-3.6.0.min.js"></script>
+    <script src="/static/js/materialize.min.js"></script>
+    
+</head>
+
+<body>
+    <div class='height_10p center-block'></div>
+    <div class='height_10p center-block'></div>
+    <div id="login_row" class="row">
+        <div class="col s12 m4 push-m4 margin-top-15">
+            <div class="card">
+                <form action='login' method='POST'>
+                    <div class="card-content">
+                        <div class="row input-field">
+                            <input type='email' name='email' id='email' placeholder='email' class='validate' />
+                            <span class="helper-text" data-error="please enter valid email" data-success=""></span>
+                        </div>
+                        <div class="row input-field">
+                            <input type='password' name='password' id='password' placeholder='password'
+                                class='validate' />
+                        </div>
+                    </div>
+                    <div class="card-action right-align">
+                        <a type="reset" id="reset" class=" btn-flat grey-text waves-effect waves-light">Reset Password</a>
+                        <button type="submit" class="green waves-effect waves-light btn-small" value="Login">Login</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="reset_row" class="row" style="display:none">
+        <div class="col s12 m4 push-m4 margin-top-15">
+            <div class="card">
+                <form action='password_reset_request' method='POST'>
+                    <div class="card-content">
+                        <div class="row input-field">
+                            <input type='email' name='email' id='email' placeholder='email' class='validate' />
+                            <span class="helper-text" data-error="please enter valid email" data-success=""></span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-action right-align">
+                        <a type="reset" id="reset_return" class=" btn-flat grey-text waves-effect waves-light">Return to Login</a>
+                        <button type="submit" class="green waves-effect waves-light btn-small" value="Login">Request Reset Link</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script>
+$('#reset').click(
+    function(){
+    $( "#login_row" ).fadeOut( "slow", function() {
+       
+        $( "#reset_row" ).fadeIn()
+
+      })
+    }
+
+)
+
+$('#reset_return').click(
+    function(){
+    $( "#reset_row" ).fadeOut( "slow", function() {
+       
+        $( "#login_row" ).fadeIn()
+
+      })
+    }
+
+)
+
+</script>
