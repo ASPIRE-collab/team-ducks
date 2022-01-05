@@ -8,15 +8,15 @@
     <div class="col s2 ">
     <ul class="collection">
       <li class="collection-item collection-top"><span class="collection-top" >Top Contributors</span></li>
-      
+    
 
       {% for contributor in top_contributors %}
 
-      <li class="collection-item"> {{ loop.index}}. &nbsp; &nbsp; <img src="{{contributor.avatar}}" alt="" class="circle tiny-avatar">  {{ contributor.name }} <span class="secondary-content contrib-pill">{{ contributor.count }}</span>  </li>
+      <li class="collection-item"> {{ loop.index}} <img src="{{contributor.avatar}}" alt="" class="circle tiny-avatar">  {{ contributor.name }} <span class="secondary-content contrib-pill">{{ contributor.count }}</span>  </li>
         
       {% endfor %}
-
-
+<li class="center"><a class="waves-effect waves-light btn rankings-button">View Full Rankings</a></li>
+      
     </ul>
   </div>
     <div class="col s6"><span class="blurb_text flow-text">

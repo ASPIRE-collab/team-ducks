@@ -65,7 +65,7 @@ def add_zooniverse_user(user_id,current_users):
             r = requests.get(item.avatar_src, allow_redirects=True)
             open(avatar_path, 'wb').write(r.content)
         else:
-            avatar_src="default.jpeg"
+            avatar_src="default.png"
         #We store the userdata  in a temporary dictionary.
         insert_dict['avatar_src']=avatar_src
         insert_dict['id']=int(item.id)

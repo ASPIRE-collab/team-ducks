@@ -198,8 +198,14 @@ color:#868686;
 }
 
 .contrib-pill{
-    background-color: #a1a1a1;
+    background-color: #ba0c2f;
     color: white;
     padding: 6px;
     border-radius: 9px;
+}
+.rankings-button{
+    margin: 11px;
+    height: 27px;
+    line-height: 28px;
+    font-size: small;
 }
