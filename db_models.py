@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
 
 
 
+
 #Class used to store Roles keys.
 class Roles(db.Model, UserMixin):
     __tablename__ = 'roles'
@@ -42,6 +43,20 @@ class PasswordResetTokens(db.Model, UserMixin):
     expire_date = db.Column(db.Date)
 
 
+class Classifications(db.Model, UserMixin):
+    __tablename__ = 'classifications'
+    id = db.Column(db.Integer, primary_key=True)
+    zooniverse_user_id = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime)
+    # =db.Column(db.JSON)
+    subject_id = db.Column(db.Integer)
+
+class ZooniverseUsers(db.Model, UserMixin):
+    __tablename__ = 'zooniverse_users'
+    id = db.Column(db.Integer, primary_key=True)
+    display_name = db.Column(db.String(100))
+    credited_name = db.Column(db.String(100))
+    avatar_src = db.Column(db.String(100))
 
 # Create Database Models
 db.create_all()

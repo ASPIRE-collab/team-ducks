@@ -1,0 +1,61 @@
+<div class='height_5p center-block'></div>
+  <div class='center  '>
+    <div class="title">Create a New Team</div>
+  </div>
+  <div class="row">
+    <div class="col s3 "></div>
+    <div class="col s6"><span class="blurb_text flow-text">
+      <input placeholder="Type New Team Name Here" id="team_name" type="text" class="validate unm_textfield">
+      <label class="unm_label" for="team_name">Team Name</label>
+      </span>
+      <div><a id="add_user_button" class="waves-effect waves-light btn">Add User to Team</a></div>
+      
+    </div>
+    <div class="col s3 "></div>
+    <div class="col s6 "><span class="flow-text"></span></div>
+  </div>
+
+
+  <div id="login-modal" class="modal">
+    <div id="login_row" class="row">
+      <div class="col s1 margin-top-15"></div>
+      <div class="col s10 margin-top-15">
+       
+          <div class="card-content">
+            <div class="row input-field">
+              <input type='text' name='user_login' id='user_login' placeholder='user_login' class='validate' />
+            </div>
+            <div class="row input-field">
+              
+            </div>
+          </div>
+          <div class="card-action right-align">
+            
+            <button id="add-user" class="green waves-effect waves-light btn-small" value="Login">Add User</button>
+          </div>
+      
+      </div>
+      <div class="col s1"></div>
+    </div>
+  </div>
+
+  <script>
+    //activate the materialize fields when the page is loaded.
+    $(document).ready(function () {
+      $('.dropdown-trigger').dropdown();
+      $('.modal').modal();
+    })
+  
+    //show the login modal
+    $('#add_user_button').click(function () {
+      login_modal = M.Modal.getInstance($('#login-modal'));
+      login_modal.open();
+    })
+  
+    $('#add-user').click(function () {
+    console.log($('#user_login').val())
+    })
+
+    
+
+  </script>

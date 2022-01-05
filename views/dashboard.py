@@ -3,7 +3,7 @@ import logging
 from flask import Blueprint, render_template, request, current_app, redirect
 from flask.helpers import url_for
 from flask_login.utils import login_required, current_user
-
+from db_models import db
 from views.admin import is_admin
 
 dashboard_bp = Blueprint('dashboard_bp',__name__)
@@ -11,6 +11,8 @@ logging.getLogger().setLevel(logging.INFO)
 
 @dashboard_bp.route("/")
 def dashboard():
+
+
     if current_user.is_authenticated:
         user_info = {
             "first_name":current_user.first_name,

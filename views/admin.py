@@ -5,16 +5,24 @@ import logging
 import smtplib
 import random
 import string
-from flask import Blueprint, flash, redirect, render_template, request, url_for,current_app,url_for
+import os
+import csv
+import requests
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for,current_app,url_for, make_response,jsonify
+from werkzeug.utils import secure_filename
 from flask.scaffold import F
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_login.utils import wraps
 from uuid import uuid4
-from app import login_manager,app_config
-from db_models import User, Roles,UserRoles,PasswordResetTokens,db
+from app import login_manager,app_config,static_path 
+from db_models import User, Roles,UserRoles,PasswordResetTokens,Classifications,db,ZooniverseUsers
 from datetime import datetime,timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from panoptes_client import Panoptes
+from panoptes_client import User as ZooniverseUser
+
 # Blueprint Configuration
 admin_bp = Blueprint(
     'admin_bp',__name__,
@@ -26,6 +34,58 @@ logging.getLogger().setLevel(logging.INFO)
 #+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+
 #|U|t|i|l|i|t|y| |F|u|n|c|t|i|o|n|s|
 #+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+
+def get_current_user_ids():
+    return_list=[]
+    all_users=db.session.query(ZooniverseUsers.id).all()
+    for user in all_users:
+        return_list.append(user[0])
+    return return_list
+
+
+def add_zooniverse_user(user_id,current_users):
+    """Adds new users to the DB with avatars.
+    
+    Args:
+        user_id (integer): Zooniverse user id.
+        current_users list(integer): list of zooniverse users currently in system.
+    Returns:
+        array: list of current users or ERR. 
+    """
+    #connect using Panoptes and get user object.
+    Panoptes.connect()
+    users = ZooniverseUser.where(id=user_id)
+    insert_dict={}
+    #This returns a generator, but only one time will be generated.
+    for item in users:
+        #If the user has a custom avatar we download it locally, otherwise we set it to the default.
+        #We are storing locally to avoid a ton of requests for images when we want to render a team or whatnot.
+        if item.avatar_src:
+            avatar_src=str(item.id)+".jpeg"
+            avatar_path=os.path.join(static_path,"avatars",avatar_src)
+            r = requests.get(item.avatar_src, allow_redirects=True)
+            open(avatar_path, 'wb').write(r.content)
+        else:
+            avatar_src="default.jpeg"
+        #We store the userdata  in a temporary dictionary.
+        insert_dict['avatar_src']=avatar_src
+        insert_dict['id']=int(item.id)
+        insert_dict['display_name']=item.display_name
+        insert_dict['credited_name']=item.credited_name
+    #We add it to the current_users, so if we come across this user again, we can skip it.
+    if item.id not in current_users:
+        current_users.append(item.id)
+    #Add new user to our table.
+    try:
+        newZUser = ZooniverseUsers(id=insert_dict['id'],display_name=insert_dict['display_name'],credited_name=insert_dict['credited_name'],avatar_src=insert_dict['avatar_src'])
+        db.session.add(newZUser)
+        db.session.commit()
+    except Exception as err:
+        db.session.rollback()
+        db.session.flush()
+        return err
+    #We return the updated list even though this is not necessary as the list is passed by reference.
+    return current_users
+
 
 def get_random_string(length):
     """Generates random strings.
@@ -125,7 +185,6 @@ def is_admin(user_obj):
 
 def get_all_user_roles():
     """Generate object with each key being the user id and the value being a list of role ids;
-
     Returns:
         object: user_roles_obj
     """
@@ -174,6 +233,13 @@ def reset_user_roles(user_id,new_roles_list):
 #  +-+-+-+-+-+-+
 #  |R|o|u|t|e|s|
 #  +-+-+-+-+-+-+
+
+
+
+@admin_bp.route("/test2")
+def admin_test():
+    return(str(get_current_user_ids()))
+
 
 @admin_bp.route("/")
 @login_required
@@ -412,6 +478,7 @@ def logout():
 
 @login_manager.user_loader
 def user_loader(id):
+    print(id)
     """Loads the user into the login_manager
 
     Args:
@@ -420,8 +487,105 @@ def user_loader(id):
     Returns:
         tuple: User object from DB.
     """
+    print(1)
     user = db.session.query(User).filter(User.id == id).first()
+    print(2)
     return user  
+
+def get_all_classification_ids():
+    all_classifications=db.session.query(Classifications.id).all()
+
+    all_classifications_ids=[]
+    for id_tupe in all_classifications:
+        print(id_tupe)
+        all_classifications_ids.append(id_tupe[0])
+    return all_classifications_ids
+
+
+
+@admin_bp.route('/extracts', methods=['POST'])
+def extracts():
+    
+    try:
+        current_users=get_current_user_ids()
+        extract_json = request.get_json()
+        print(extract_json)
+        cdate, frag = extract_json['created_at'].split('.')
+        classifications_id=extract_json['id']
+        subject_id=extract_json['subject_id']
+        zooniverse_user_id=extract_json['user_id']
+        if int(zooniverse_user_id) not in current_users:
+            current_users=add_zooniverse_user(zooniverse_user_id,current_users)
+        newClassification = Classifications(id=int(classifications_id), zooniverse_user_id=int(zooniverse_user_id),created_at=datetime.strptime(cdate, "%Y-%m-%dT%H:%M:%S"),subject_id=int(subject_id))
+        db.session.add(newClassification)
+        db.session.commit()
+
+        data = {'status': 'RECIEVED', 'message': 'SUCCESS'}
+        print('good')
+        return make_response(jsonify(data), 201)
+    except:
+        db.session.rollback()
+        db.session.flush()
+        data = {'status': 'ERROR', 'message': 'FAIL'}
+        return make_response(jsonify(data), 500)
+
+
+#select zooniverse_user_id, count(*) as count from (select distinct zooniverse_user_id, subject_id  from classifications) as lol group by zooniverse_user_id order by count DESC;
+
+
+
+@admin_bp.route('/update_extracts', methods=['GET','POST'])
+@login_required
+def update_extracts():
+    #TODO add function to get all zooniverse ids
+    zooniverse_user_ids=[]
+    if request.method == 'POST':
+        all_classifications_ids=get_all_classification_ids()
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and file.filename.rsplit('.', 1)[1].lower()=='csv':
+            filename = secure_filename(file.filename)
+            csv_file=os.path.join(app_config['UPLOAD_FOLDER'], filename)
+            file.save(csv_file)
+
+            with open(csv_file, newline='') as csvfile:
+                csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+                next(csv_reader)
+                for row in csv_reader:
+                    print(int(row[0]))
+                    if int(row[0]) not in all_classifications_ids:
+                        
+                        try:
+                            if row[2] not in zooniverse_user_ids:
+                                zooniverse_user_ids=add_zooniverse_user(row[2],zooniverse_user_ids)
+                            print(row[0],row[2],row[7],row[13])
+                            
+                            newClassification = Classifications(id=int(row[0]), zooniverse_user_id=int(row[2]),created_at=datetime.strptime(row[7], '%Y-%m-%d %H:%M:%S %Z'),subject_id=int(row[13]))
+                            print(row[0],row[2],row[7],row[13])
+                            db.session.add(newClassification)
+                            db.session.commit()
+                        except Exception as err:
+                            db.session.rollback()
+                            db.session.flush()
+                            return str(err)
+                    # print(row[0],row[2],row[7],row[13])
+            return ":)"
+    if request.method == 'GET':
+        return '''
+        <!doctype html>
+        <title>Upload new File</title>
+        <h1>Upload new File</h1>
+        <form method=post enctype=multipart/form-data>
+        <input type=file name=file>
+        <input type=submit value=Upload>
+        </form>
+        '''
+
 
 
 
