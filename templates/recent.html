@@ -1,0 +1,26 @@
+<div class='height_5p center-block'></div>
+<div class='center  '>
+  <div class="title">Drones for Ducks</div>
+</div>
+<div class="row">
+  <div class="col s2 "></div>
+
+  <div class="col s8 ">
+    <ul class="collection">
+      <li class="collection-item collection-top"><span class="collection-top">Most Recent Contributors</span></li>
+
+
+      {% for contributor in all_contributors %}
+
+      <li class="collection-item"> {{ loop.index}} <img src="{{contributor.avatar}}" alt="" class="circle tiny-avatar">
+        {{ contributor.name }} <span class="secondary-content black-text">{{ contributor.count }} UTC</span> </li>
+
+      {% endfor %}
+      
+
+    </ul>
+  </div>
+
+  <div class="col s2 "></div>
+
+</div>

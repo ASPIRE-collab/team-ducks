@@ -8,22 +8,38 @@
       <input placeholder="Type New Team Name Here" id="team_name" type="text" class="validate unm_textfield">
       <label class="unm_label" for="team_name">Team Name</label>
       </span>
-      <div><a id="add_user_button" class="waves-effect waves-light btn">Add User to Team</a></div>
-      
+      <div style="margin-top:20px" class="center"><span>Invite at least one user to create a team. You can even add yourself!</span> </div>
+      <div style="margin-top:2px" class="center"><span>Users in your invite list will be sent a notification to join your team via Messages on Zooniverse.org</span> </div>
+
+      <div class="center" ><a id="add_user_button" class=" waves-effect waves-light btn">Invite a User to Team</a> </div>
+      <div id="invite_list" class="center invite_list display_none" >Invite List</div>
     </div>
+    
     <div class="col s3 "></div>
     <div class="col s6 "><span class="flow-text"></span></div>
   </div>
 
+  <div  class="row">
+    <div class="col s3 "></div>
+    <div class="col s6 ">
+      <div id="user_list" class="row">
 
-  <div id="login-modal" class="modal">
+      </div>
+    </div>
+    <div class="col s3 "></div>
+
+  </div>
+
+
+  <div id="adduser-modal" class="modal">
     <div id="login_row" class="row">
       <div class="col s1 margin-top-15"></div>
-      <div class="col s10 margin-top-15">
-       
+      <div class="col s10 margin-top-60p">
+        
           <div class="card-content">
-            <div class="row input-field">
-              <input type='text' name='user_login' id='user_login' placeholder='user_login' class='validate' />
+            <div class="row input-field" >
+              <input type='text' name='user_login_form' id='user_login_form' placeholder='Zooniverse Username' class='validate' />
+              <label class="unm_label" for="user_login_form">Zooniverse Username of User to Invite.</label>
             </div>
             <div class="row input-field">
               
@@ -31,7 +47,7 @@
           </div>
           <div class="card-action right-align">
             
-            <button id="add-user" class="green waves-effect waves-light btn-small" value="Login">Add User</button>
+            <button id="add-user" class="green waves-effect waves-light btn-small" value="Login">Add User to Invite List</button>
           </div>
       
       </div>
@@ -39,21 +55,142 @@
     </div>
   </div>
 
-  <script>
+  <div class="create-team-div">
+    <button id="create-team" style="display:none;" class="green waves-effect waves-light btn-small" value="Login">Create Team</button>
+  </div>
+    
+  
+<script>
+  
+      function check_valid_team(){
+        $('#invite_list').show()
+        if (create_json['members'].length>0 && create_json['name'].length>0){
+          console.log("good")
+          $('#create-team').show()
+        }else{
+          $('#create-team').hide()
+        }
+      }
     //activate the materialize fields when the page is loaded.
     $(document).ready(function () {
       $('.dropdown-trigger').dropdown();
       $('.modal').modal();
     })
   
+    $('#team_name').keyup(
+      function(){
+        create_json['name']=$('#team_name').val()
+        check_valid_team()
+      }
+    )
     //show the login modal
     $('#add_user_button').click(function () {
-      login_modal = M.Modal.getInstance($('#login-modal'));
+      login_modal = M.Modal.getInstance($('#adduser-modal'));
       login_modal.open();
     })
-  
+    function add_member(id,username){
+      found=false
+      for (obj of create_json['members']) {
+        if (obj['login']==username){
+          found=true
+        }
+      }
+      if (!found){
+        create_json['members'].push({'login':username,'id':id});
+      }
+
+      check_valid_team()
+
+    }
+    function update_user_list(){
+    $('#user_list').html("")
+      for (obj of create_json['members']) {
+        
+       $('#user_list').append("<div class=\"col s4 user_col\">"+obj['login']+"</div>")
+      }
+ 
+
+    }
+    create_json={'name':'','members':[]}
     $('#add-user').click(function () {
-    console.log($('#user_login').val())
+
+      $("#add-user").html("");
+      $('#add-user').css('background-image','url(/static/images/tinyspinner.gif)'); 
+      post_json={}
+     
+      post_json['username']=$('#user_login_form').val().trim()
+      $.ajax({
+        type: "POST",
+        url: "/teams/user_lookup/",
+        data: JSON.stringify(post_json),
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            if (data.status == "found") {
+                M.toast({ html: 'User Added', classes: 'rounded button-green', displayLength:1000});
+
+                add_member(data.id,data.login)
+                update_user_list()
+                login_modal = M.Modal.getInstance($('#adduser-modal'));
+
+                login_modal.close();
+                console.log(create_json)
+                $("#add-user").html("Add User to Invite List");
+                $('#add-user').css('background-image','none');
+            } else {
+                M.toast({ html: 'User Not Found!', classes: 'rounded button-red' });
+                $("#add-user").html("Add User to Invite List");
+                $('#add-user').css('background-image','none');
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            M.toast({ html: 'ERROR: Problem Connecting to Zooniverse API', classes: 'rounded button-red' });
+            $("#add-user").html("Add User to Invite List");
+            $('#add-user').css('background-image','none');
+        }
+        
+    });
+
+
+    })
+
+
+
+
+
+
+    $('#create-team').click(function () {
+
+      $("#add-user").html("");
+      $('#add-user').css('background-image','url(/static/images/tinyspinner.gif)'); 
+      
+     
+      
+      $.ajax({
+        type: "POST",
+        url: "/teams/create_a_team",
+        data: JSON.stringify(create_json),
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            if (data.status == "success") {
+                
+                $("#add-user").html("Add User to Invite List");
+                $('#add-user').css('background-image','none');
+                window.location.href="/"
+            } else {
+                M.toast({ html: data.message, classes: 'rounded button-red' });
+                $("#add-user").html("Add User to Invite List");
+                $('#add-user').css('background-image','none');
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            M.toast({ html: data.message, classes: 'rounded button-red' });
+            $("#add-user").html("Add User to Invite List");
+            $('#add-user').css('background-image','none');
+        }
+        
+    });
+
+
     })
 
     

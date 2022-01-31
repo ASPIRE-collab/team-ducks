@@ -145,3 +145,4 @@ cython_debug/
 #.idea/
 config.py
 static/avatars/*.jpeg
+scripts/*

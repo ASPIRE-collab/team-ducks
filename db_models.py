@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from app import db, app
+from app import db
 from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
@@ -47,9 +47,15 @@ class Classifications(db.Model, UserMixin):
     __tablename__ = 'classifications'
     id = db.Column(db.Integer, primary_key=True)
     zooniverse_user_id = db.Column(db.Integer)
+    user_ip=db.Column(db.String(40))
+    workflow_id= db.Column(db.Integer)
+    workflow_version= db.Column(db.Float)
     created_at = db.Column(db.DateTime)
-    # =db.Column(db.JSON)
+    meta_data = db.Column(db.JSON)
+    annotations = db.Column(db.JSON)
+    subject_data = db.Column(db.JSON)
     subject_id = db.Column(db.Integer)
+    ingest_type=db.Column(db.String(10))
 
 class ZooniverseUsers(db.Model, UserMixin):
     __tablename__ = 'zooniverse_users'
@@ -57,6 +63,35 @@ class ZooniverseUsers(db.Model, UserMixin):
     display_name = db.Column(db.String(100))
     credited_name = db.Column(db.String(100))
     avatar_src = db.Column(db.String(100))
+
+
+class CountsAll(db.Model, UserMixin):
+    __tablename__ = 'counts_all'
+    zooniverse_user_id = db.Column(db.Integer, primary_key=True)
+    count = db.Column(db.Integer)
+
+
+class Teams(db.Model, UserMixin):
+    __tablename__ = 'teams'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    owner_id = db.Column(db.Integer)
+ 
+class TeamMembers(db.Model, UserMixin):
+    __tablename__ = 'team_members'
+    id = db.Column(db.Integer, primary_key=True)
+    zooniverse_user_id = db.Column(db.Integer)
+    team_id = db.Column(db.Integer)
+
+
+class Invitations(db.Model, UserMixin):
+    __tablename__ = 'invitations'
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer)
+    zooniverse_user_id = db.Column(db.Integer)
+    accepted=db.Column(db.Boolean)
+    rejected=db.Column(db.Boolean)
+    token = db.Column(db.String(255))
 
 # Create Database Models
 db.create_all()

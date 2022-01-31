@@ -1,0 +1,93 @@
+<div class="center margin-top-60p"></div>
+<div class="row">
+    <div class="col s3"></div>
+    <div class="col s6 unm_font">
+
+        <div class="center margin-top-60p">
+            <div style="font-size: 27px;">{{display_name}}, you Have Been Invited to team {{name}}!</div>
+
+            <div style="font-size: 17px;">If you agree to join team {{name}}, your label statistics will contribute to
+                the team score.
+            </div>
+            <div style="font-size: 17px;">This will allow you to join team challenges. </div>
+            <div style="font-size: 17px;">Only your label statistics and username/userid will be shared.</div>
+        </div>
+
+
+        <div class="row">
+            <div class="col s2"></div>
+            <div class="col s4">
+
+                <div id="join" style="background-color: #007a86 !important;"
+                    class="pointer big-buttons create-team-button">Join The Team!</div>
+
+            </div>
+            <div class="col s4">
+                <div id="decline" class="pointer big-buttons create-team-button">Decline Invitation.</div>
+            </div>
+            <div class="col s2"></div>
+        </div>
+
+
+    </div>
+
+
+    <div class="col s3"></div>
+
+
+</div>
+
+<script>
+
+    $(".pointer").click(function(){
+        console.log({'choice':this.id})
+        choice_json={'choice':this.id}
+
+        $.ajax({
+            type: "POST",
+            url: "/teams/invite/{{token}}",
+            data: JSON.stringify(choice_json),
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.status == "success") {
+                    location.reload();
+  
+                } else {
+                    M.toast({ html: data.message, classes: 'rounded button-red' });
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log('fail')
+            }
+            
+        });
+
+    })
+
+
+
+
+
+
+
+
+
+
+    $('#create-team').click(function () {
+
+        $("#add-user").html("");
+        $('#add-user').css('background-image','url(/static/images/tinyspinner.gif)'); 
+        
+       
+        
+
+  
+  
+      })
+
+
+
+
+
+
+</script>

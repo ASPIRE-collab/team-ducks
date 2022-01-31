@@ -1,0 +1,45 @@
+<div class="row" style="margin-top: 200px;">
+    <div class="col s3 "></div>
+    <div class="col s6 ">
+        <div id="blurb" style="text-align:center;">Processing</div>
+        <div id="progdiv" class="progress">
+            <div id="prog" class="determinate" style="width: 0%"></div>
+        </div>
+    </div>
+    <div class="col s3 "></div>
+</div>
+<script>
+    var intervalId = window.setInterval(function(){
+        check_progress()
+      }, 1000);
+
+function check_progress(){
+    $.get( "/admin/progress/{{thread_id}}", function( data ) {
+       console.log(data)
+       //{inserted: 0, processed: 234, running: 1, total: 9999}
+
+       if (data.running==0){
+        
+        $("#progdiv").hide();
+        console.log(data.inserted)
+        if(data.inserted==0){
+            $("#blurb").text(data.processed+" records were processed but no new records were found.")
+        }else{
+            $("#blurb").text(data.processed+" records were processed and "+data.inserted+" new records were added.")
+        }
+        clearInterval(intervalId) 
+       }else{
+       var percent_complete = (data.processed / data.total) * 100;
+       
+       $("#prog").css("width", `${Math.floor(percent_complete)}%`);
+       $("#blurb").text("Processing "+data.processed+" of "+data.total+". "+data.inserted+" new records found.")
+       }
+      }).fail(function() {
+        $("#blurb").text("Job {{thread_id}} not found.")  
+        clearInterval(intervalId) 
+      });
+}
+
+
+
+</script>

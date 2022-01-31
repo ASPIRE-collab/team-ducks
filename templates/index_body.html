@@ -4,8 +4,10 @@
   </div>
   <div class="row">
     <div class="col s2 "></div>
+    <div class="col s8 " style="border-top-style: double;">
+    
 
-    <div class="col s2 ">
+    <div class="col s5 ">
     <ul class="collection">
       <li class="collection-item collection-top"><span class="collection-top" >Top Contributors</span></li>
     
@@ -15,11 +17,14 @@
       <li class="collection-item"> {{ loop.index}} <img src="{{contributor.avatar}}" alt="" class="circle tiny-avatar">  {{ contributor.name }} <span class="secondary-content contrib-pill">{{ contributor.count }}</span>  </li>
         
       {% endfor %}
-<li class="center"><a class="waves-effect waves-light btn rankings-button">View Full Rankings</a></li>
+  <li class="center"><a href="/teams/rankings/all" class="waves-effect waves-light btn rankings-button">View Full Rankings</a></li>
       
     </ul>
   </div>
-    <div class="col s6"><span class="blurb_text flow-text">
+    <div class="col s7">
+      
+        <p class="blurb_text flow-text">
+        <img src="/static/images/SunAvatar.jpg" alt="SunAvatar" class="avatar_image">
         Migrating birds like ducks, geese, and cranes are important parts of many ecosystems along their seasonal travel
         routes. To ensure there are enough resources to go around, managers of public lands in the Southwestern United
         States conduct waterfowl surveys to know how many birds to expect over winter. Traditional methods of counting
@@ -34,82 +39,21 @@
         Apache National Wildlife Refuge in central New Mexico. Your labels will help train a computer algorithm to
         identify and count the birds automatically and ultimately helps federal land managers guide decision making for
         wildlife conservation!
-      </span></div>
+      </p>
+      <div class="row">
+        <div class="col s6">
+          <a href="/teams/create_a_team">
+          <div class="big-buttons create-team-button">Create a Team!</div>
+        </a>
+        </div>
+        <div class="col s6">
+          <div class="big-buttons create-challange-button">Already Have a Team?<br>Create a Challenge!</div>
+        </div>
+      </div>
+    </div>
+    </div>
+    
     <div class="col s2 "></div>
-    <div class="col s6 "><span class="flow-text"> </span></div>
-    <div class="col s6 "><span class="flow-text"> </span></div>
+
   </div>
-  <div id="login-modal" class="modal">
-    <div id="login_row" class="row">
-      <div class="col s1 margin-top-15"></div>
-      <div class="col s10 margin-top-15">
-        <form action='/admin/login' method='POST'>
-          <div class="card-content">
-            <div class="row input-field">
-              <input type='email' name='email' id='email' placeholder='email' class='validate' />
-              <span class="helper-text" data-error="please enter valid email" data-success=""></span>
-            </div>
-            <div class="row input-field">
-              <input type='password' name='password' id='password' placeholder='password' class='validate' />
-            </div>
-          </div>
-          <div class="card-action right-align">
-            <a type="reset" id="reset_button" class=" btn-flat grey-text waves-effect waves-light">Reset Password</a>
-            <button type="submit" class="green waves-effect waves-light btn-small" value="Login">Login</button>
-          </div>
-        </form>
-      </div>
-      <div class="col s1"></div>
-    </div>
-  </div>
-  <div id="reset-pass-modal" class="modal">
-    <div id="reset_row" class="row">
-      <div class="col s1"></div>
-      <div class="col s10">
-        <form action='/admin/password_reset_request' method='POST'>
-          <div class="card-content">
-            <div class="row input-field">
-              <input type='email' name='email' id='email' placeholder='email' class='validate' />
-              <span class="helper-text" data-error="please enter valid email" data-success=""></span>
-            </div>
-          </div>
-          <div class="card-action right-align">
-            <a type="reset" id="reset_return" class=" btn-flat grey-text waves-effect waves-light">Return to
-              Login</a>
-            <button type="submit" class="green waves-effect waves-light btn-small" value="Login">Request Reset
-              Link</button>
-          </div>
-        </form>
-      </div>
-      <div class="col s1"></div>
-    </div>
-  </div>
-  <script>
-    //activate the materialize fields when the page is loaded.
-    $(document).ready(function () {
-      $('.dropdown-trigger').dropdown();
-      $('.modal').modal();
-    })
   
-    //show the login modal
-    $('#login_button').click(function () {
-      login_modal = M.Modal.getInstance($('#login-modal'));
-      login_modal.open();
-    })
-  
-    //hide the login modal and show the reset password modal
-    $('#reset_button').click(function () {
-      login_modal = M.Modal.getInstance($('#login-modal'));
-      login_modal.close();
-      reset_modal = M.Modal.getInstance($('#reset-pass-modal'));
-      reset_modal.open();
-    })
-  
-    //hide the password reset modal and show the login modal
-    $('#reset_return').click(function () {
-      reset_modal = M.Modal.getInstance($('#reset-pass-modal'));
-      reset_modal.close();
-      login_modal = M.Modal.getInstance($('#login-modal'));
-      login_modal.open();
-    })
-  </script>
