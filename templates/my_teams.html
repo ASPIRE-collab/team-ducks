@@ -1,11 +1,17 @@
 <div class="center margin-top-60p"></div>
 <div class="row">
-    <div class="col s3"></div>
-    <div class="col s6 unm_font center">
+    <div class="col s4"></div>
+    <div class="col s4 unm_font center">
         <a href="/teams/create_a_team" class="waves-effect waves-light btn">Create a New Team</a>
         <div class="center margin-top-60p">
+          {% if my_teams|length > 0 %}
             <div style="font-size: 27px;">Click on team to manage it.</div>
+            {% else %}
+            <div style="font-size: 27px;">You have no Teams.</div>
+            <div style="font-size: 27px;">You can create one using the button above.</div>
+          {% endif %}
             <div style="font-size: 27px;">
+              
                 {% for team in my_teams %}
                 <a href="/teams/manage_team/{{ team.id }}">
                   <div class="col s12 user_col">
@@ -13,8 +19,9 @@
                   </div>
                 </a>
                 {% endfor %}
+        
             </div>
         </div>
     </div>
-    <div class="col s3"></div>
+    <div class="col s4"></div>
 </div>

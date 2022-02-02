@@ -12,6 +12,9 @@
 <body class="height_100p">
   
   <ul id="links-dropdown1" class="dropdown-content dropdown-top">
+    {% if is_authenticated == True %}
+    <li><a class="dropdown-text" href="/teams/my_teams/">Manage Teams</a></li>
+    {% endif %}
     <li><a class="dropdown-text" href="https://aspire.unm.edu/">Aspire</a></li>
     <li><a class="dropdown-text" href="https://www.zooniverse.org/projects/rowan-aspire/drones-for-ducks">zooniverse</a>
     </li>
@@ -21,10 +24,9 @@
     <li><a class="dropdown-text" href="/admin/edit_users">Edit Users</a></li>
     <li><a class="dropdown-text" href="/admin/upload_extracts">Upload Extracts CSV</a></li>
   </ul>
-  <ul id="links-logged-in-dropdown" class="dropdown-content dropdown-top">
-    <li><a class="dropdown-text" href="/teams/my_teams/">Manage Teams</a></li>
 
-  </ul>
+
+
 
   <nav class="outer-nav">
     <div class="nav-wrapper navbar-unm ">
@@ -33,10 +35,7 @@
       <a href="/"><span  class="ducks-nav">Drones for Ducks</span></a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
       
-        {% if is_authenticated == True %}
-        <li><a class="dropdown-trigger" href="#!" data-target="links-logged-in-dropdown">User Links<i
-          class="material-icons  arrow_drop_down right">arrow_drop_down</i></a></li>
-        {% endif %}
+
 
         {% if is_admin == True %}
         <li><a class="dropdown-trigger" href="#!" data-target="links-admin-dropdown">Admin Links<i
@@ -44,7 +43,7 @@
    
         {% endif %}
 
-        <li><a class="dropdown-trigger" href="#!" data-target="links-dropdown1">Links<i
+        <li><a class="dropdown-trigger" href="#!" data-target="links-dropdown1">User Links<i
               class="material-icons  arrow_drop_down right">arrow_drop_down</i></a></li>
         {% if is_authenticated == True %}
         <li><a class="login-logout" href="/admin/logout" id="logout_button">Logout</a></li>

@@ -4,8 +4,9 @@ from app import app_config
 from sqlalchemy import func
 from db_models import User,Classifications,CountsAll, ZooniverseUsers,Teams,TeamMembers,Invitations,db
 from panoptes_client import Panoptes, User
-from views.admin import render_index
+from views.admin import render_index,add_zooniverse_user,get_current_user_ids
 from uuid import uuid4
+
 
 import requests
 import json
@@ -77,9 +78,78 @@ def invite(token):
             return {'status':'error','message':'Invitation not found.'} 
  
 
+# @teams_bp.route("/remove_team_member/<team_id>" , methods=['POST']) 
+# @login_required
+# def remove_team_member(team_id):
+#     team=db.session.query(Teams).filter(Teams.id==int(team_id)).first()
+#     if team:
+#         if team.owner_id!=current_user.id:
+#             return {'status':'error','message':'You do not own this team.'}
+    
 
+@teams_bp.route("/invite_user/<team_id>" , methods=['POST']) 
+@login_required
+def invite_user(team_id):
+    team=db.session.query(Teams).filter(Teams.id==int(team_id)).first()
+    
+    if team:
+        if team.owner_id!=current_user.id:
+            return {'status':'error','message':'You do not own this team.'}
+    team_name=team.name
+    user_json = request.get_json()
+    current_users=get_current_user_ids()
+    if int(user_json['id']) not in current_users:
+        current_users=add_zooniverse_user(user_json['id'],current_users)
+    existing_users=db.session.query(TeamMembers).filter(TeamMembers.team_id==int(team_id)).filter(TeamMembers.zooniverse_user_id==int(user_json['id'])).first()
+    if existing_users:
+        return {'status':'error','message':'User is already in team.'}
+    existing_invite=db.session.query(Invitations).filter(Invitations.zooniverse_user_id==user_json['id']).filter(Invitations.team_id==team_id).first()
+    p=Panoptes.connect(username=app_config['ZOONIVERSE_USER'], password=app_config['ZOONIVERSE_PASS'])
+    encoded_jwt=p.get_bearer_token()
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/vnd.api+json; version=1"
+    headers["Content-Type"]="application/json"
+    headers["Authorization"] = "Bearer "+encoded_jwt
+    headers["authority"] = "talk.zooniverse.org"
+    headers['origin'] = 'https://www.zooniverse.org'
+    headers['sec-fetch-site'] = 'same-site'
+    headers['sec-fetch-mode'] = 'cors'
+    headers['sec-fetch-dest'] = 'empty'
+    headers['referer'] = 'https://www.zooniverse.org/'
+    if existing_invite==None:
 
-
+        try:
+            token=str(uuid4())
+            new_invite=Invitations(team_id=team_id,zooniverse_user_id=user_json['id'],accepted=False,rejected=False,token=token)
+            db.session.add(new_invite)
+            db.session.commit()
+            json_data={"http_cache":True,"conversations":{"user_id":2417880,"title":"Drones For Ducks Team Invite","body":"You have been invited to join a Drones for Ducks team!\nIf you wish to be a part of the '"+team_name+"' team,\nClick the URL below:\n[View "+team_name+" Invitation]("+request.host_url+"teams/invite/"+token+")","recipient_ids":[int(user_json['id'])]}}
+            print(json_data)
+            r=requests.post('https://talk.zooniverse.org/conversations',headers=headers,data=json.dumps(json_data))
+            if r.status_code!=200:
+                return {'status':'error','message':'failed to send invite.'}
+            else:
+                return {'status':'success','message':'Invitation sent.'}
+        except Exception as err:
+            db.session.rollback()
+            db.session.flush()
+            return {'status':'error','message':str(err)}
+    else:
+        try:
+            token=existing_invite.token
+            updated_user_row = db.session.query(Invitations).filter(Invitations.zooniverse_user_id==user_json['id']).filter(Invitations.team_id==team_id).update({'accepted':0,'rejected':0})
+            db.session.commit()
+            json_data={"http_cache":True,"conversations":{"user_id":2417880,"title":"Drones For Ducks Team Invite","body":"You have been invited to join a Drones for Ducks team!\nIf you wish to be a part of the '"+team_name+"' team,\nClick the URL below:\n[View "+team_name+" Invitation]("+request.host_url+"teams/invite/"+token+")","recipient_ids":[int(user_json['id'])]}}
+            r=requests.post('https://talk.zooniverse.org/conversations',headers=headers,data=json.dumps(json_data))
+            print(r.text)
+            if r.status_code!=200:
+                return {'status':'error','message':'failed to send invite.'}
+            else:
+                return {'status':'success','message':'Invitation sent.'}
+        except Exception as err:
+            db.session.rollback()
+            db.session.flush()
+            return {'status':'error','message':str(err)}
 
 
 
@@ -132,26 +202,100 @@ def create_a_team():
                             r=requests.post('https://talk.zooniverse.org/conversations',headers=headers,data=json.dumps(json_data))
                             if r.status_code!=200:
                                 return {'status':'error','message':'failed to send invite.'}
-                            # print(r.json())
 
                         except Exception as err:
                             db.session.rollback()
                             db.session.flush()
                             return {'status':'error','message':str(err)}
+                    return {'status':'success','message':'Team '+user_json['name']+' created.','team_id':new_team.id}
         except Exception as err:
             return {'status':'error','message':str(err)}
         return {'status':'success','message':'Team '+user_json['name']+' created.'}
 
 
 
+@teams_bp.route("/remove_team_member/<team_id>" , methods=['POST']) 
+@login_required
+def remove_team_member(team_id):
+    team=db.session.query(Teams).filter(Teams.id==team_id).first()
+    if team:
+        if team.owner_id==current_user.id:
+            user_json = request.get_json()
+            remove_user_id=user_json['id']
+            try:
+                db.session.query(TeamMembers).filter(TeamMembers.zooniverse_user_id==remove_user_id).filter(TeamMembers.team_id==team_id).delete()
+                db.session.commit()
+                return {'status':'success','message':'User Successfully Removed from Team.'}
+
+            except Exception as e:
+                return {'status':'error','message':str(e)}
+
+
+        else:
+            return {'status':'error','message':'Team does not exist.'}
+    else:
+        return {'status':'error','message':'Team does not exist.'}
+
+@teams_bp.route("/team_data/<team_id>" , methods=['GET']) 
+@login_required
+def team_data(team_id):
+
+    return_obj={'team_members':[],'accepted_invites':[],'rejected_invites':[],'pending_invites':[]}
+    
+    team=db.session.query(Teams).filter(Teams.id==team_id).first()
+    if team:
+        if team.owner_id==current_user.id:
+
+            team_members=db.session.query(ZooniverseUsers).filter(TeamMembers.team_id==team.id).filter(ZooniverseUsers.id==TeamMembers.zooniverse_user_id).all()
+            for tm in team_members:
+                return_obj['team_members'].append({'id':tm.id,'display_name':tm.display_name,'avatar_src':tm.avatar_src})
+                
+            invites=db.session.query(Invitations,ZooniverseUsers).filter(Invitations.zooniverse_user_id==ZooniverseUsers.id).filter(Invitations.team_id==team.id).all()
+            for invite in invites:
+                if invite[0].accepted==True and invite[0].rejected==False:
+                    
+                    return_obj['accepted_invites'].append({'id':invite[1].id,'display_name':invite[1].display_name,'avatar_src':invite[1].avatar_src})
+                if invite[0].accepted==False and invite[0].rejected==True:
+                    
+                    return_obj['rejected_invites'].append({'id':invite[1].id,'display_name':invite[1].display_name,'avatar_src':invite[1].avatar_src})
+                if invite[0].accepted==False and invite[0].rejected==False:
+                    
+                    return_obj['pending_invites'].append({'id':invite[1].id,'display_name':invite[1].display_name,'avatar_src':invite[1].avatar_src})
+            return return_obj
+        else:
+            return {'status':'error','message':'You do not own this team.'}
+    else:
+        return {'status':'error','message':'Team not found.'}
+
+
+
+@teams_bp.route("/manage_team/<team_id>" , methods=['GET', 'POST']) 
+@login_required
+def manage_team(team_id):
+    if request.method == 'GET':
+        team=db.session.query(Teams).filter(Teams.id==team_id).first()
+        if team:
+            if team.owner_id==current_user.id:
+                body=render_template('manage_team.html',team_id=team.id,team_name=team.name)
+                return render_index(body)
+            else:
+                body=render_template('general_error.html',error_string='You cannot manage teams created by others.')
+                return render_index(body)
+        else:
+            body=render_template('general_error.html',error_string='Team not found.')
+            return render_index(body)
+ 
 
 
 @teams_bp.route("/user_lookup/" , methods=['POST']) 
 def user_lookup():
     Panoptes.connect()
     user_json = request.get_json()
+    print(user_json)
     users = User.where(login=user_json['username'])
+    print(users)
     for item in users:
+        print(item)
         return_dict={'status':'found'}
         return_dict['id']=item.id
         return_dict['login']=item.login

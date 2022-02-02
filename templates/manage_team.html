@@ -1,0 +1,380 @@
+<div class="row margin-top-60p">
+    <div class="col s2"></div>
+    <div class="col s8">
+        <div class="row">
+            <div class="center">
+                <h3>Team {{team_name}}</h3>
+            </div>
+            <div class="col s4">
+                <ul class="collection noselect">
+                    <li class="collection-item center noselect ">
+                        <h5>Team Status</h5>
+                    </li>
+                    <li id="team_members" class="collection-item  manage_team_menu manage_team_menu_chosen ">Team Members
+                        <span id="team_members_count" class="badge"></span>
+                    </li>
+                    <li id="pending_invites" class="collection-item manage_team_menu manage_team_menu_not_chosen pointer">Pending Invites
+                        <span id="pending_invites_count" class="badge"></span>
+                    </li>
+                    <li id="accepted_invites" class="collection-item manage_team_menu manage_team_menu_not_chosen pointer">Accepted Invites
+                        <span id="accepted_invites_count" class="badge"></span>
+                    </li>
+                    <li id="declined_invites" class="collection-item manage_team_menu manage_team_menu_not_chosen pointer">Declined Invites
+                        <span id="declined_invites_count" class="badge"></span>
+                    </li>
+                </ul>
+            </div>
+            <div class="col s8">
+
+                <ul id="user_lists" class="collection">
+                    <li class="collection-item">Alvin</li>
+
+                </ul>
+
+            </div>
+        </div>
+    </div>
+    <div class="col s2"></div>
+
+    <div id="adduser-modal" class="modal">
+        <div id="login_row" class="row">
+          <div class="col s1 margin-top-15"></div>
+          <div class="col s10 margin-top-60p">
+            
+              <div class="card-content">
+                <div class="row input-field" >
+                  <input type='text' name='user_login_form' id='user_login_form' placeholder='Zooniverse Username' class='validate' />
+                  <label class="unm_label" for="user_login_form">Zooniverse Username of the user you wish to Invite.</label>
+                </div>
+                <div class="row input-field">
+                  
+                </div>
+              </div>
+              <div class="card-action right-align">
+                
+                <button id="add-user" class="green waves-effect waves-light btn-small" value="Login">Invite User to Team</button>
+              </div>
+          
+          </div>
+          <div class="col s1"></div>
+        </div>
+      </div>
+
+
+      <div id="removeuser-modal" class="modal">
+        <div id="login_row" class="row">
+          <div class="col s1 margin-top-15"></div>
+          <div class="col s10 margin-top-60p">
+            
+              <div class="card-content">
+                <div class="row input-field" >
+                  <input type='text' name='rm_user_login_form' id='rm_user_login_form' placeholder='Zooniverse Username to Remove.' class='validate' />
+                  <label id="rm_user_login_form_id" class="unm_label" for="rm_user_login_form">Verify you intend to remove this user by typing the Zooniverse username.</label>
+                </div>
+                <div class="row input-field">
+                  
+                </div>
+              </div>
+              <div class="card-action right-align">
+                
+                <button id="remove-user-button" class="green waves-effect waves-light btn-small" value="Login">Remove User From Team</button>
+              </div>
+          
+          </div>
+          <div class="col s1"></div>
+        </div>
+      </div>
+
+
+</div>
+
+<script>
+
+
+    function open_add_user() {
+        login_modal = M.Modal.getInstance($('#adduser-modal'));
+        login_modal.open();
+      }
+
+    var noop = function(){};
+    function build_team_members(){
+        html_string='<li class="collection-item center noselect "><h5>Team Members </h5> <a onclick="open_add_user()" class="invite_new_user">Invite a New Team Member</a></li>'
+        user_data.team_members.forEach(function (element) {
+            html_string=html_string+'<li  class="collection-item noselect"><img src="/static/avatars/'+element.avatar_src+'" alt="" class="circle tiny-avatar">&nbsp'+element.display_name+' <a  onclick="remove_team_member('+element.id+')" class=" invite_new_user flt_right unm_background_color">Remove Team Member</a></li>'
+        })
+        $('#user_lists').html(html_string)
+    }
+
+    function build_pending(){
+        html_string='<li class="collection-item center noselect "><h5>Pending Invites</h5></li>'
+        user_data.pending_invites.forEach(function (element) {
+            html_string=html_string+'<li id="'+element.id+'"class="collection-item  "><img src="/static/avatars/'+element.avatar_src+'" alt="" class="circle tiny-avatar">&nbsp'+element.display_name+'</li>'
+        })
+        $('#user_lists').html(html_string)
+    }
+
+    function build_accepted(){
+        html_string='<li class="collection-item center noselect "><h5>Accepted Invites</h5></li>'
+        user_data.accepted_invites.forEach(function (element) {
+            html_string=html_string+'<li id="'+element.id+'"class="collection-item "><img src="/static/avatars/'+element.avatar_src+'" alt="" class="circle tiny-avatar">&nbsp'+element.display_name+'</li>'
+        })
+        $('#user_lists').html(html_string)
+    }
+
+    function build_declined(){
+        html_string='<li class="collection-item center noselect "><h5>Declined Invites</h5></li>'
+        user_data.rejected_invites.forEach(function (element) {
+            html_string=html_string+'<li id="'+element.id+'"class="collection-item "><img src="/static/avatars/'+element.avatar_src+'" alt="" class="circle tiny-avatar">&nbsp'+element.display_name+'</li>'
+        })
+        $('#user_lists').html(html_string)
+    }
+   
+
+
+    $( document ).ready(function() {
+        update_data(build_team_members)
+        setInterval(function(){ 
+          update_data(build_lists)
+            
+        }, 5000);
+    });
+
+
+
+function remove_team_member(id){
+    
+    remove_id=id
+    console.log(remove_id)
+    remove_member_modal = M.Modal.getInstance($('#removeuser-modal'));
+    remove_member_modal.open();
+}
+
+function remove_team_member_from_server(id){
+    post_json={'id':id}
+
+    $.ajax({
+        type: "POST",
+        url: "/teams/remove_team_member/{{team_id}}",
+        data: JSON.stringify(post_json),
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+
+            if (data.status == "success") {
+
+                M.toast({ html: data.message, classes: 'rounded button-red' });
+                
+            } else {
+  
+                $("#remove-user-button").html("Remove User From Team");
+                $('#remove-user-button').css('background-image','none');
+                M.toast({ html: data.message, classes: 'rounded button-red' });
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            M.toast({ html: errorThrown, classes: 'rounded button-red' });
+            
+            $("#remove-user-button").html("Remove User From Team");
+            $('#remove-user-button').css('background-image','none');
+        }
+        
+    });
+
+
+    $("#remove-user-button").html("Remove User From Team");
+    $('#remove-user-button').css('background-image','none');
+    remove_member_modal = M.Modal.getInstance($('#removeuser-modal'));
+    remove_member_modal.close();
+}
+
+
+$('#remove-user-button').click(function () {
+
+    $("#remove-user-button").html("");
+    $('#remove-user-button').css('background-image','url(/static/images/tinyspinner.gif)'); 
+    post_json={}
+   
+    post_json['username']=$('#rm_user_login_form').val().trim()
+    $.ajax({
+      type: "POST",
+      url: "/teams/user_lookup/",
+      data: JSON.stringify(post_json),
+      contentType: "application/json; charset=utf-8",
+      success: function (data) {
+          console.log(data)
+          if (data.status == "found") {
+              
+            console.log({'login':data.login,'id':data.id})
+            //send_invite(data.id,data.login)
+            console.log(data.id,remove_id)
+            if (data.id==remove_id){
+                remove_team_member_from_server(data.id)
+                M.toast({ html: "Removing user.", classes: 'rounded button-red' });
+            }else{
+                M.toast({ html: "User does not Match. NOT REMOVING!", classes: 'rounded button-red' });
+            }
+       
+          } else {
+
+              $("#remove-user-button").html("Remove User From Team");
+              $('#remove-user-button').css('background-image','none');
+              M.toast({ html: "User does not Match. NOT REMOVING!", classes: 'rounded button-red' });
+          }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+          M.toast({ html: 'ERROR: Problem Connecting to Zooniverse API', classes: 'rounded button-red' });
+          $("#remove-user-button").html("Remove User From Team");
+          $('#remove-user-button').css('background-image','none');
+      }
+      
+  });
+
+
+  })
+  function send_invite(id,login){
+    $.ajax({
+        type: "POST",
+        url: "/teams/invite_user/{{team_id}}",
+        data: JSON.stringify({'id':id}),
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            if (data.status == "success") {
+                $("#add-user").html("Invite User to Team");
+                $('#add-user').css('background-image','none');
+                M.toast({ html: data.message, classes: 'rounded button-green', displayLength:1000});
+                login_modal = M.Modal.getInstance($('#adduser-modal'));
+                login_modal.close();
+            } else {
+                M.toast({ html: data.message, classes: 'rounded button-red' });
+                $("#add-user").html("Invite User to Team");
+                $('#add-user').css('background-image','none');
+                login_modal = M.Modal.getInstance($('#adduser-modal'));
+                login_modal.close();
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            M.toast({ html: 'ERROR: Problem Connecting to Zooniverse API', classes: 'rounded button-red' });
+            $("#add-user").html("Invite User to Team");
+            $('#add-user').css('background-image','none');
+        }
+    });
+}
+
+
+
+
+
+user_data={}
+current_list="team_members"
+remove_id=null
+
+function build_lists(){
+    if (current_list=='team_members'){
+        build_team_members()
+    }
+    if (current_list=='pending_invites'){
+        build_pending()
+    }
+    if (current_list=='declined_invites'){
+        build_declined()
+    }
+    if (current_list=='accepted_invites'){
+        build_accepted()
+    }
+}
+
+$('.manage_team_menu').click(function(){
+    $('.manage_team_menu').removeClass( "manage_team_menu_chosen" )
+    $('.manage_team_menu').addClass( "manage_team_menu_not_chosen pointer" )
+    if($("#"+this.id).hasClass( "manage_team_menu_not_chosen" )){
+        console.log("#"+this.id)
+        current_list=this.id
+        $("#"+this.id).removeClass( "manage_team_menu_not_chosen pointer" )
+        $("#"+this.id).addClass( "manage_team_menu_chosen" )
+
+        build_lists()
+
+
+    }
+})
+
+
+function update_data(callback){
+    
+    callback = callback || noop;
+    $.getJSON( "/teams/team_data/{{team_id}}", function( data ) {
+        user_data=data
+        callback()
+        $('#team_members_count').text(data.team_members.length)
+        $('#accepted_invites_count').text(data.accepted_invites.length)
+        $('#declined_invites_count').text(data.rejected_invites.length)
+        $('#pending_invites_count').text(data.pending_invites.length)
+        
+
+
+      });
+}
+
+
+
+$('#add-user').click(function () {
+
+    $("#add-user").html("");
+    $('#add-user').css('background-image','url(/static/images/tinyspinner.gif)'); 
+    post_json={}
+   
+    post_json['username']=$('#user_login_form').val().trim()
+    $.ajax({
+      type: "POST",
+      url: "/teams/user_lookup/",
+      data: JSON.stringify(post_json),
+      contentType: "application/json; charset=utf-8",
+      success: function (data) {
+          if (data.status == "found") {
+              
+            console.log({'login':data.login,'id':data.id})
+            send_invite(data.id,data.login)
+       
+          } else {
+              $("#add-user").html("Invite User to Team");
+              $('#add-user').css('background-image','none');
+          }
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+          M.toast({ html: 'ERROR: Problem Connecting to Zooniverse API', classes: 'rounded button-red' });
+          $("#add-user").html("Invite User to Team");
+          $('#add-user').css('background-image','none');
+      }
+      
+  });
+
+
+  })
+  function send_invite(id,login){
+    $.ajax({
+        type: "POST",
+        url: "/teams/invite_user/{{team_id}}",
+        data: JSON.stringify({'id':id}),
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            if (data.status == "success") {
+                $("#add-user").html("Invite User to Team");
+                $('#add-user').css('background-image','none');
+                M.toast({ html: data.message, classes: 'rounded button-green', displayLength:1000});
+                login_modal = M.Modal.getInstance($('#adduser-modal'));
+                login_modal.close();
+            } else {
+                M.toast({ html: data.message, classes: 'rounded button-red' });
+                $("#add-user").html("Invite User to Team");
+                $('#add-user').css('background-image','none');
+                login_modal = M.Modal.getInstance($('#adduser-modal'));
+                login_modal.close();
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            M.toast({ html: 'ERROR: Problem Connecting to Zooniverse API', classes: 'rounded button-red' });
+            $("#add-user").html("Invite User to Team");
+            $('#add-user').css('background-image','none');
+        }
+    });
+}
+</script>

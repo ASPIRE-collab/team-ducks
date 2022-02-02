@@ -494,7 +494,7 @@ def login():
     if request.method == 'GET':
         # Bypass if user is logged in
         if current_user.is_authenticated:
-            return redirect(url_for('dashboard_bp.dashboard'))
+            return redirect("/")
         return render_template('login.html')
     # Validate login attempt
     if request.method == 'POST':

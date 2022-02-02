@@ -11,7 +11,7 @@
       <div style="margin-top:20px" class="center"><span>Invite at least one user to create a team. You can even add yourself!</span> </div>
       <div style="margin-top:2px" class="center"><span>Users in your invite list will be sent a notification to join your team via Messages on Zooniverse.org</span> </div>
 
-      <div class="center" ><a id="add_user_button" class=" waves-effect waves-light btn">Invite a User to Team</a> </div>
+      <div class="center" ><a id="add_user_button" class=" waves-effect waves-light btn">Invite a Zooniverse User to Team</a> </div>
       <div id="invite_list" class="center invite_list display_none" >Invite List</div>
     </div>
     
@@ -39,7 +39,7 @@
           <div class="card-content">
             <div class="row input-field" >
               <input type='text' name='user_login_form' id='user_login_form' placeholder='Zooniverse Username' class='validate' />
-              <label class="unm_label" for="user_login_form">Zooniverse Username of User to Invite.</label>
+              <label class="unm_label" for="user_login_form">Zooniverse Username of the user you wish to Invite.</label>
             </div>
             <div class="row input-field">
               
@@ -54,6 +54,25 @@
       <div class="col s1"></div>
     </div>
   </div>
+
+
+
+  <div id="creating-team-modal" class="modal">
+    <div id="login_row" class="row">
+      <div class="col s1 margin-top-15"></div>
+      <div class="col s10 margin-top-60p">
+        <div class="center unm_font"><h4>Creating Your Team. Please Wait.</h4>
+        
+          <img style="width: 297px;" src="/static/images/2_lil_ducks.png" alt="3 ducks">
+          <div><h4>Getting Your Ducks In a row</h4> <img style="width: 65px;" src="/static/images/orange-spinner.gif" alt="wait"> </div> 
+        </div>
+
+        
+      </div>
+      <div class="col s1"></div>
+    </div>
+  </div>
+
 
   <div class="create-team-div">
     <button id="create-team" style="display:none;" class="green waves-effect waves-light btn-small" value="Login">Create Team</button>
@@ -163,7 +182,8 @@
       $("#add-user").html("");
       $('#add-user').css('background-image','url(/static/images/tinyspinner.gif)'); 
       
-     
+      login_modal = M.Modal.getInstance($('#creating-team-modal'));
+      login_modal.open();
       
       $.ajax({
         type: "POST",
@@ -175,7 +195,9 @@
                 
                 $("#add-user").html("Add User to Invite List");
                 $('#add-user').css('background-image','none');
-                window.location.href="/"
+                login_modal.close();
+                window.location.href="/teams/manage_team/"+data.team_id
+              
             } else {
                 M.toast({ html: data.message, classes: 'rounded button-red' });
                 $("#add-user").html("Add User to Invite List");
