@@ -1,6 +1,10 @@
 .height_100p{
     height: 100%;
   }
+
+  .height_80p{
+    height: 80%;
+  }
 .height_33p{
     height: 33%;
 }
@@ -11,6 +15,7 @@
 .height_5p{
     height: 5%;
 }
+
 
 
 .btn, .btn-large, .btn-small {
@@ -648,5 +653,98 @@ input[type=tel]:not(.browser-default):focus:not([readonly]) + label,
 input[type=number]:not(.browser-default):focus:not([readonly]) + label,
 input[type=search]:not(.browser-default):focus:not([readonly]) + label,
 textarea.materialize-textarea:focus:not([readonly]) + label {
+  color: #ba0c2f;
+}
+
+
+.challenge_banner {    
+  background-color: #ba0c2f;
+  height: 79%;
+  border-radius: 19px;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.p_top_60{
+  padding-top: 60px;
+}
+.p_top_70{
+  padding-top: 70px;
+}
+
+.banner_title{
+  font-family: 'vitessesans';
+  background-color: #ba0c2f;
+  color: white;
+}
+
+.button_bottom{
+  left: 0;
+    position: absolute;
+    text-align: center;
+    bottom: 10px;
+    width: 100%;
+}
+
+.datepicker-table td.is-selected {
+  background-color: #ba0c2f !important;
+  color: #fff;
+}
+
+.datepicker-cancel,
+.datepicker-clear,
+.datepicker-today,
+.datepicker-done {
+  color: #ba0c2f !important;
+ 
+}
+
+
+.timepicker-digital-display {
+  background-color: #ba0c2f !important;
+}
+
+.timepicker-tick:hover {
+  background-color: rgba(38, 166, 154, 0.25);
+}
+
+.timepicker-canvas line {
+  stroke: #ba0c2f !important;
+}
+
+.timepicker-canvas-bearing {
+  fill: #ba0c2f !important;
+}
+
+.timepicker-canvas-bg {
+  fill: #ba0c2f !important;
+}
+
+.timepicker-close {
+  color: #ba0c2f !important;
+}
+
+.datepicker-date-display {
+
+  background-color: #ba0c2f  !important;
+ 
+}
+
+
+.datepicker-table td.is-today {
+  color: #ba0c2f !important;
+}
+
+.select-wrapper input.select-dropdown:focus {
+  border-bottom: 1px solid #ba0c2f !important;
+}
+
+
+.dropdown-content li > a, .dropdown-content li > span {
+  color: #ba0c2f;
+
+}
+
+.red_help_text{
   color: #ba0c2f;
 }

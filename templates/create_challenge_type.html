@@ -1,0 +1,168 @@
+<script src="/static/js/jquery.fittext.js"></script>
+
+
+
+
+<div class="row p_top_70">
+    
+    <div class="center"><img style="width: 220px;" src="/static/images/3ducks-coop-holding-hands.svg" alt="co-op ducks">
+    </div>
+    <div class="center red_help_text">How will this specific challenge be identified?</div>
+    <div class="col s5 "></div>
+    <div class="input-field col s2 ">
+        <input placeholder="Challenge Name" id="challenge_name" type="text" class="validate user_input">
+        <label for="challenge_name">Challenge Name</label>
+    </div>
+    <div class="col s5 "></div>
+</div>
+
+
+<div class="row ">
+    <div class="center red_help_text">What team will work on this challenge?</div>
+    <div class="col s5 "></div>
+    <div class="input-field col s2 ">
+        <select name="team" id="team" class="user_input">
+            <option value="" disabled selected>Choose your team.</option>
+            {% for team in teams %}
+            <option id="{{team.id}}" value="{{team.id}}">{{team.name}}</option>
+            {% endfor %}
+        </select>
+        <label for="team">Team</label>
+    </div>
+    <div class="col s5 "></div>
+</div>
+
+
+
+
+<div class="row ">
+    <div class="center red_help_text">How many classifications should each team member complete?</div>
+    <div class="col s5 "></div>
+    <div class="input-field col s2 ">
+        <input placeholder="Goal Number" id="goal_number" type="number" class="validate center user_input">
+        <div class="col s5 "></div>
+    </div>
+</div>
+
+<div class="row ">
+    <div class="center red_help_text">When should the challenge begin and end?</div>
+    <div class="col s4 "></div>
+    <div class="col s1 "><input type="text" id="start-date" name="start-date" class="datepicker user_input"> <label
+            for="start-date">Start Date</label></div>
+    <div class="col s1 "><input type="text" id="start-time" name="start-time" class="timepicker user_input"><label
+            for="start-time">Start Time</label></div>
+            
+    <div class="col s1 "><input type="text" id="end-date" name="end-date" class="datepicker user_input"> <label for="end-date">End
+            Date</label></div>
+    <div class="col s1 "><input type="text" id="end-time" name="end-time" class="timepicker user_input" ><label for="end-time">End
+            Time</label></div>
+    <div class="col s4 "></div>
+</div>
+
+
+<div class="row ">
+    <div class="center red_help_text">Should users, including team members, without a login be allowed to view this challenge?</div>
+    <div class="col s4 "></div>
+    <div class="col s4 ">
+        <div class="center">        <label>
+            <input type="checkbox" class="filled-in" checked="checked" />
+            <span>Publicly Viewable</span>
+          </label></div>
+
+    </div>
+    <div class="col s4 "></div>
+</div>
+
+
+<div class="center red_help_text"><a id="create-challenge" class="waves-effect waves-light btn disabled">create challenge</a></div>
+<script>
+    jQuery(".fit").fitText(1.25);
+
+
+    challenge_name=''
+    team=''
+    goal_number=''
+    start_datetime=undefined
+    end_datetime=undefined
+
+    function checkvalid(){
+        challenge_name=$('#challenge_name').val()
+
+        team=$("#team option:selected" ).val();
+        if (team=='Choose your team.'){
+            team=''
+        }
+        goal_number=$('#goal_number').val()
+        start_date=$('#start-date').val()
+        start_time=$('#start-time').val()
+        end_date=$('#end-date').val()
+        end_time=$('#end-time').val()
+        val_list=[challenge_name,team,goal_number,start_date,start_time,end_date,end_time]
+        //$('#create-challenge').removeClass( 'disabled' )
+        valid=true
+        val_list.forEach(
+            function(element){
+                if(element.length==0){
+                    $('#create-challenge').addClass( 'disabled' )
+                    valid=false
+                }
+            }
+        )
+        console.log(valid)
+        if (valid){
+            start_datetime=Date.parse(start_date+' '+start_time);
+            end_datetime=Date.parse(end_date+' '+end_time);
+            $('#create-challenge').addClass( 'disabled' )
+            if (start_datetime<end_datetime){
+                $('#create-challenge').removeClass( 'disabled' )
+            }
+        }
+        console.log(challenge_name.length,team.length,goal_number.length,start_date.length,start_time.length,end_date.length,end_time.length)
+    }
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker();
+        $('.timepicker').timepicker();
+        $('select').formSelect();
+    });
+
+    $('.user_input').keyup(
+            checkvalid
+    )
+    $('.user_input').change(
+        checkvalid
+    )
+    $('#create-challenge').click(
+        function(){
+            post_obj={'challenge_name':challenge_name,'team':team,'goal_number':goal_number,'start_datetime':start_datetime,'end_datetime':end_datetime}
+
+            console.log(post_obj)
+
+
+
+
+
+
+            $.ajax({
+                type: "POST",
+                url: "/challenges/create_challenge/{{challenge_type}}",
+                data: JSON.stringify(post_obj),
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    console.log(data)
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  //  M.toast({ html: 'ERROR: Problem Connecting to Zooniverse API', classes: 'rounded button-red' });
+                  //  $("#add-user").html("Add User to Invite List");
+                  //  $('#add-user').css('background-image','none');
+                }
+                
+            });
+
+
+
+
+        }
+    )
+
+</script>

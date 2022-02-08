@@ -21,12 +21,13 @@ from views.admin import render_index
 from views.dashboard import dashboard_bp
 from views.admin import admin_bp
 from views.teams import teams_bp
+from views.challenges import challenges_bp
 
 # Register blueprints
 app.register_blueprint(dashboard_bp,url_prefix='/dashboard')
 app.register_blueprint(admin_bp,url_prefix='/admin')
 app.register_blueprint(teams_bp,url_prefix='/teams')
-
+app.register_blueprint(challenges_bp,url_prefix='/challenges')
 
 
 @app.route("/" , methods=['GET', 'POST']) 

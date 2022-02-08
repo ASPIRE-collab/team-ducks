@@ -214,6 +214,7 @@ def create_a_team():
 
 
 
+
 @teams_bp.route("/remove_team_member/<team_id>" , methods=['POST']) 
 @login_required
 def remove_team_member(team_id):
