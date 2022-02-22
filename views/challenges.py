@@ -251,7 +251,7 @@ def view_challenge(challenge_id):
                 if is_public or is_owner:
 
                     
-                    body=render_template('view_challenge.html',counts=counts,goal_number=goal_number,challenge_id=challenge_id,end=this_challenge[0].end_datetime)
+                    body=render_template('view_cooperative_challenge.html',counts=counts,goal_number=goal_number,challenge_id=challenge_id,end=this_challenge[0].end_datetime)
                     return render_index(body)
             else:
                 body=render_template('general_message.html',error_string="Challenge ID not found.")
