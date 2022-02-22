@@ -99,6 +99,10 @@
     var noop = function(){};
     function build_team_members(){
         html_string='<li class="collection-item center noselect "><h5>Team Members </h5> <a onclick="open_add_user()" class="invite_new_user">Invite a New Team Member</a></li>'
+        console.log(user_data.team_members.length)
+        if (user_data.team_members.length==0){
+            html_string=html_string+'<li class="collection-item center noselect "><p>No invitations have been accepted yet.</p> <p>Check back later.</p></li>'
+        }
         user_data.team_members.forEach(function (element) {
             html_string=html_string+'<li  class="collection-item noselect"><img src="/static/avatars/'+element.avatar_src+'" alt="" class="circle tiny-avatar">&nbsp'+element.display_name+' <a  onclick="remove_team_member('+element.id+')" class=" invite_new_user flt_right unm_background_color">Remove Team Member</a></li>'
         })
@@ -214,7 +218,7 @@ $('#remove-user-button').click(function () {
             }
        
           } else {
-
+            console.log("getting here")
               $("#remove-user-button").html("Remove User From Team");
               $('#remove-user-button').css('background-image','none');
               M.toast({ html: "User does not Match. NOT REMOVING!", classes: 'rounded button-red' });
@@ -337,6 +341,7 @@ $('#add-user').click(function () {
           } else {
               $("#add-user").html("Invite User to Team");
               $('#add-user').css('background-image','none');
+              M.toast({ html: "Zooniverse User Not Found.", classes: 'rounded button-red' });
           }
       },
       error: function (XMLHttpRequest, textStatus, errorThrown) {

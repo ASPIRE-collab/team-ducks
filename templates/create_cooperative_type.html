@@ -1,25 +1,17 @@
 <script src="/static/js/jquery.fittext.js"></script>
 
 
-
-
-<div class="row p_top_70">
-    
     <div class="center"><img style="width: 220px;" src="/static/images/3ducks-coop-holding-hands.svg" alt="co-op ducks">
     </div>
-    <div class="center red_help_text">How will this specific challenge be identified?</div>
-    <div class="col s5 "></div>
-    <div class="input-field col s2 ">
-        <input placeholder="Challenge Name" id="challenge_name" type="text" class="validate user_input">
+    <div class="center banner_title">Cooperative Challenge</div>
+<div class="row margin-top-75px">
+    
+
+    <div class="col s2 "></div>
+    <div class="input-field col s4 ">
+        <input placeholder="Challenge Name" id="challenge_name" type="text" class="validate user_input"> <img class="tool_question_right tooltipped"  data-tooltip="Give a name to this challenge." src="/static/images/tooltip.svg" alt="">
         <label for="challenge_name">Challenge Name</label>
     </div>
-    <div class="col s5 "></div>
-</div>
-
-
-<div class="row ">
-    <div class="center red_help_text">What team will work on this challenge?</div>
-    <div class="col s5 "></div>
     <div class="input-field col s2 ">
         <select name="team" id="team" class="user_input">
             <option value="" disabled selected>Choose your team.</option>
@@ -28,47 +20,43 @@
             {% endfor %}
         </select>
         <label for="team">Team</label>
+        <img class="tool_question_right tooltipped"  data-tooltip="What team will work on this challenge?" src="/static/images/tooltip.svg" alt="">
     </div>
-    <div class="col s5 "></div>
-</div>
-
-
-
-
-<div class="row ">
-    <div class="center red_help_text">How many classifications should each team member complete?</div>
-    <div class="col s5 "></div>
     <div class="input-field col s2 ">
-        <input placeholder="Goal Number" id="goal_number" type="number" class="validate center user_input">
+        <input placeholder="Number of labels to complete." id="goal_number" type="number" class="validate  user_input"><img class="tool_question_right tooltipped"  data-tooltip="How many classifications should each team member complete?" src="/static/images/tooltip.svg" alt="">
         <div class="col s5 "></div>
     </div>
+    <div class="col s2 "></div>
 </div>
 
-<div class="row ">
-    <div class="center red_help_text">When should the challenge begin and end?</div>
-    <div class="col s4 "></div>
-    <div class="col s1 "><input type="text" id="start-date" name="start-date" class="datepicker user_input"> <label
+
+
+<div class="row margin-top-75px">
+    <div class="col s2 "></div>
+    <div class="col s2"><input type="text" id="start-date" name="start-date" class="datepicker user_input"> <label
             for="start-date">Start Date</label></div>
-    <div class="col s1 "><input type="text" id="start-time" name="start-time" class="timepicker user_input"><label
+    <div class="col s2 "><input type="text" id="start-time" name="start-time" class="timepicker user_input"><label
             for="start-time">Start Time</label></div>
             
-    <div class="col s1 "><input type="text" id="end-date" name="end-date" class="datepicker user_input"> <label for="end-date">End
+    <div class="col s2 "><input type="text" id="end-date" name="end-date" class="datepicker user_input"> <label for="end-date">End
             Date</label></div>
-    <div class="col s1 "><input type="text" id="end-time" name="end-time" class="timepicker user_input" ><label for="end-time">End
-            Time</label></div>
-    <div class="col s4 "></div>
+    <div class="col s2 "><input type="text" id="end-time" name="end-time" class="timepicker user_input" ><label for="end-time">End
+            Time</label>
+            <img class="tool_question_right tooltipped"  data-tooltip="When should the challenge begin and end?" src="/static/images/tooltip.svg" alt="">
+        </div>    
+    <div class="col s2 "></div>
 </div>
 
 
-<div class="row ">
-    <div class="center red_help_text">Should users, including team members, without a login be allowed to view this challenge?</div>
+<div class="row margin-top-75px">
     <div class="col s4 "></div>
     <div class="col s4 ">
         <div class="center">        <label>
-            <input type="checkbox" class="filled-in" checked="checked" />
-            <span>Publicly Viewable</span>
-          </label></div>
-
+            <input id="public" type="checkbox" class="filled-in" checked="checked" />
+            <span>Publicly Viewable Results</span>
+          </label><img class="tool_question tooltipped"  data-tooltip="Should users, including team members, without a login be allowed to view this challenge?" src="/static/images/tooltip.svg" alt="">
+        </div>
+        
     </div>
     <div class="col s4 "></div>
 </div>
@@ -124,6 +112,7 @@
         $('.datepicker').datepicker();
         $('.timepicker').timepicker();
         $('select').formSelect();
+        $('.tooltipped').tooltip();
     });
 
     $('.user_input').keyup(
@@ -134,7 +123,14 @@
     )
     $('#create-challenge').click(
         function(){
-            post_obj={'challenge_name':challenge_name,'team':team,'goal_number':goal_number,'start_datetime':start_datetime,'end_datetime':end_datetime}
+            checked=undefined
+            if ($('#public').is(":checked"))
+            {
+                checked=true
+            }else{
+                checked=false
+            }
+            post_obj={'challenge_name':challenge_name,'team':team,'goal_number':goal_number,'start_datetime':start_datetime,'end_datetime':end_datetime,'public':checked}
 
             console.log(post_obj)
 
@@ -149,7 +145,12 @@
                 data: JSON.stringify(post_obj),
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    console.log(data)
+                    if (data.status=="success"){
+                        M.toast({ html: data.message, classes: 'rounded button-red' });
+                        window.location.href = "/challenges/view_challenge/"+data.challenge_id;
+                    }else{
+                        M.toast({ html: 'ERROR: '+data.message, classes: 'rounded button-red' });
+                    }
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                   //  M.toast({ html: 'ERROR: Problem Connecting to Zooniverse API', classes: 'rounded button-red' });

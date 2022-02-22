@@ -1,0 +1,27 @@
+<div class="center margin-top-60p"></div>
+<div class="row">
+    <div class="col s4"></div>
+    <div class="col s4 unm_font center">
+        <a href="/challenges/" class="waves-effect waves-light btn">Create a New Challenge</a>
+        <div class="center margin-top-60p">
+          {% if challenges.challenges|length > 0 %}
+            <div style="font-size: 27px;">Click on Challenge to view it.</div>
+            {% else %}
+            <div style="font-size: 27px;">You have no Challenges</div>
+            <div style="font-size: 27px;">You can create one using the button above.</div>
+          {% endif %}
+            <div style="font-size: 27px;">
+            
+                {% for challenge in challenges.challenges %}
+                <a href="/challenges/view_challenge/{{challenge.challenge_id}}">
+                  <div class="col s12 user_col">
+                    <div>{{ challenge.team_name }} - {{ challenge.challenge_name }}</div>
+                  </div>
+                </a>
+                {% endfor %}
+        
+            </div>
+        </div>
+    </div>
+    <div class="col s4"></div>
+</div>

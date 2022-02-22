@@ -20,7 +20,7 @@ from flask_login.utils import wraps
 from uuid import uuid4
 from app import login_manager,app_config,static_path 
 from sqlalchemy import func
-from db_models import User, Roles,UserRoles,PasswordResetTokens,Classifications,db,ZooniverseUsers,Classifications,CountsAll
+from db_models import ChallengeCounts, TeamMembers, Teams, User, Roles,UserRoles,PasswordResetTokens,Classifications,db,ZooniverseUsers,Classifications,CountsAll,Challenges
 from datetime import datetime,timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -138,14 +138,64 @@ def add_zooniverse_user(user_id,current_users):
 def update_single_user_rankings(user_id):
     count=db.session.query(func.count(Classifications.id)).filter(Classifications.zooniverse_user_id==int(user_id)).filter(Classifications.workflow_id==17287).first()
     print(count)
-    try:
-        updated_user_row = db.session.query(CountsAll).filter(CountsAll.zooniverse_user_id==int(user_id)).update({'count':count[0]})
-        db.session.commit()
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-        db.session.flush()
-        return e
+    #check if record exists.
+    existing=db.session.query(CountsAll).filter(CountsAll.zooniverse_user_id==int(user_id)).first()
+    if existing:
+        try:
+            updated_user_row = db.session.query(CountsAll).filter(CountsAll.zooniverse_user_id==int(user_id)).update({'count':count[0]})
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            db.session.flush()
+            return e
+    else:
+        try:
+            newcount=CountsAll(zooniverse_user_id=int(user_id),count=1)
+            db.session.add(newcount)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            db.session.flush()
+            return e
+
+def update_challenge_rankings(user_id):
+    from datetime import datetime
+
+    now = datetime.now() # current date and time
+    now_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    #get list of all challenges that this user is currently a part of.
+    #select * from teams,challenges,team_members ,zooniverse_users where challenges.team_id =teams.id and team_members.team_id =teams.id and team_members.zooniverse_user_id =zooniverse_users.id and start_datetime <'2022-02-09 10:25:06' and end_datetime > '2022-02-09 10:25:06' and zooniverse_users.id=2426149;
+    current_challenges=db.session.query(Challenges.id
+    ).filter(Challenges.team_id==Teams.id
+    ).filter(Teams.id==TeamMembers.team_id
+    ).filter(TeamMembers.zooniverse_user_id==ZooniverseUsers.id
+    ).filter(Challenges.start_datetime<=now_timestamp
+    ).filter(Challenges.end_datetime>=now_timestamp
+    ).filter(ZooniverseUsers.id==user_id)
+    for challenge in current_challenges:
+        exists=db.session.query(ChallengeCounts).filter(ChallengeCounts.challenge_id==challenge[0]).filter(ChallengeCounts.user_id==user_id).first()
+        if exists:
+            try:
+                updated_user_row = db.session.query(ChallengeCounts).filter(ChallengeCounts.challenge_id==challenge[0]).filter(ChallengeCounts.user_id==user_id).update(dict(count=exists.count+1))
+                db.session.commit()
+            except Exception as e:
+                print(e)
+                db.session.rollback()
+                db.session.flush()
+        else:
+            try:
+                newcount=ChallengeCounts(challenge_id=challenge[0],user_id=user_id,count=1)
+                db.session.add(newcount)
+                db.session.commit()
+            except Exception as e:
+                print(e)
+                db.session.rollback()
+                db.session.flush()
+                return e
+
 
 def update_all_rankings():
     db.session.execute('''TRUNCATE TABLE counts_all''')
@@ -314,9 +364,9 @@ def reset_user_roles(user_id,new_roles_list):
 
 
 @admin_bp.route("/test2")
-@admin_required
+@login_required
 def admin_test():
-    return(str(get_current_user_ids()))
+    return(update_challenge_rankings(2388665))
 
 
 @admin_bp.route("/")
@@ -585,8 +635,8 @@ def extracts():
     try:
         current_users=get_current_user_ids()
         extract_json = request.get_json()
-        print(extract_json)
-        cdate, frag = extract_json['created_at'].split('.')
+        
+        created_date, frag = extract_json['created_at'].split('.')
         classifications_id=extract_json['id']
         subject_id=extract_json['subject_id']
         zooniverse_user_id=extract_json['user_id']
@@ -607,7 +657,7 @@ def extracts():
         user_ip=None,
         workflow_id=workflow_id,
         workflow_version=workflow_version,
-        created_at=datetime.strptime(cdate, "%Y-%m-%dT%H:%M:%S"),
+        created_at=datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S"),
         meta_data=json.dumps(meta_data),
         annotations=json.dumps(annotations),
         subject_data=json.dumps(subject_data),
@@ -616,6 +666,7 @@ def extracts():
         db.session.add(newClassification)
         db.session.commit()
         update_single_user_rankings(int(zooniverse_user_id))
+        update_challenge_rankings(int(zooniverse_user_id))
         data = {'status': 'RECEIVED', 'message': 'SUCCESS'}
         print('good')
         

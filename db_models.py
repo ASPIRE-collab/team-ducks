@@ -93,6 +93,25 @@ class Invitations(db.Model, UserMixin):
     rejected=db.Column(db.Boolean)
     token = db.Column(db.String(255))
 
+class Challenges(db.Model, UserMixin):
+    __tablename__ = 'challenges'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    team_id = db.Column(db.Integer)
+    goal_number = db.Column(db.Integer)
+    start_datetime= db.Column(db.DateTime)
+    end_datetime= db.Column(db.DateTime)
+    public=db.Column(db.Boolean)
+    type = db.Column(db.String(50))
+
+class ChallengeCounts(db.Model, UserMixin):
+    __tablename__ = 'challenge_counts'
+    id = db.Column(db.Integer, primary_key=True)
+    challenge_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
+    count = db.Column(db.Integer)
+
+
 # Create Database Models
 db.create_all()
 db.session.commit()

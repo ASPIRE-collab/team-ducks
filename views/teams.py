@@ -2,15 +2,22 @@ from flask import Blueprint, render_template, request
 from flask_login import current_user, login_required
 from app import app_config 
 from sqlalchemy import func
-from db_models import User,Classifications,CountsAll, ZooniverseUsers,Teams,TeamMembers,Invitations,db
+from db_models import ChallengeCounts, User,Classifications,CountsAll, ZooniverseUsers,Teams,TeamMembers,Invitations,db
 from panoptes_client import Panoptes, User
 from views.admin import render_index,add_zooniverse_user,get_current_user_ids
+from views.challenges import normalize_challenge_counts, remove_user_challenge_counts
 from uuid import uuid4
 
 
 import requests
 import json
 from requests.structures import CaseInsensitiveDict
+
+
+
+
+
+
 
 # Blueprint Configuration
 teams_bp = Blueprint(
@@ -60,6 +67,7 @@ def invite(token):
                     db.session.add(new_member)
                     db.session.query(Invitations).filter(Invitations.token==token).update({'accepted':True})
                     db.session.commit()
+                    normalize_challenge_counts(invite.team_id)
                     return {'status':'success','message':'Thanks for joining!'}
                 except Exception as err:
                     db.session.rollback()
@@ -123,7 +131,7 @@ def invite_user(team_id):
             new_invite=Invitations(team_id=team_id,zooniverse_user_id=user_json['id'],accepted=False,rejected=False,token=token)
             db.session.add(new_invite)
             db.session.commit()
-            json_data={"http_cache":True,"conversations":{"user_id":2417880,"title":"Drones For Ducks Team Invite","body":"You have been invited to join a Drones for Ducks team!\nIf you wish to be a part of the '"+team_name+"' team,\nClick the URL below:\n[View "+team_name+" Invitation]("+request.host_url+"teams/invite/"+token+")","recipient_ids":[int(user_json['id'])]}}
+            json_data={"http_cache":True,"conversations":{"user_id":2417880,"title":"Drones For Ducks Team Invite","body":"You have been invited to join a Drones for Ducks team!\nIf you wish to be a part of the '"+team_name+"' team,\nClick the URL below:\n[View "+team_name+" Invitation]("+request.host_url+"teams/invite/"+token+")\nIf you don't want to be part of the team you can ignore this message.","recipient_ids":[int(user_json['id'])]}}
             print(json_data)
             r=requests.post('https://talk.zooniverse.org/conversations',headers=headers,data=json.dumps(json_data))
             if r.status_code!=200:
@@ -139,7 +147,7 @@ def invite_user(team_id):
             token=existing_invite.token
             updated_user_row = db.session.query(Invitations).filter(Invitations.zooniverse_user_id==user_json['id']).filter(Invitations.team_id==team_id).update({'accepted':0,'rejected':0})
             db.session.commit()
-            json_data={"http_cache":True,"conversations":{"user_id":2417880,"title":"Drones For Ducks Team Invite","body":"You have been invited to join a Drones for Ducks team!\nIf you wish to be a part of the '"+team_name+"' team,\nClick the URL below:\n[View "+team_name+" Invitation]("+request.host_url+"teams/invite/"+token+")","recipient_ids":[int(user_json['id'])]}}
+            json_data={"http_cache":True,"conversations":{"user_id":2417880,"title":"Drones For Ducks Team Invite","body":"You have been invited to join a Drones for Ducks team!\nIf you wish to be a part of the '"+team_name+"' team,\nClick the URL below:\n[View "+team_name+" Invitation]("+request.host_url+"teams/invite/"+token+")\nIf you don't want to be part of the team you can ignore this message.","recipient_ids":[int(user_json['id'])]}}
             r=requests.post('https://talk.zooniverse.org/conversations',headers=headers,data=json.dumps(json_data))
             print(r.text)
             if r.status_code!=200:
@@ -226,6 +234,8 @@ def remove_team_member(team_id):
             try:
                 db.session.query(TeamMembers).filter(TeamMembers.zooniverse_user_id==remove_user_id).filter(TeamMembers.team_id==team_id).delete()
                 db.session.commit()
+                remove_user_challenge_counts(team_id,remove_user_id)
+                
                 return {'status':'success','message':'User Successfully Removed from Team.'}
 
             except Exception as e:

@@ -1,0 +1,140 @@
+<!-- <div class="col s8 " style="border-top-style: double;"></div> -->
+<div class="row p_top_60">
+    <div class="col s2 "></div>
+
+
+
+    <div class="col s8  ">
+
+
+        <div class="center">
+            <img style="width:200px" src="/static/images/3ducks-coop-holding-hands.svg">
+        </div>
+
+        <ul  class="collection">
+            <li class="collection-item collection-top"><span class="collection-top"><span class="challenge-title">Team Goal:</span> </span> <span class="challenge-title time-remaining" >Remaining Time:</span> <span id="countdown"></span>
+            </li>
+        </ul>
+
+     
+   
+        <ul id="count-ul" class="collection">
+
+
+
+            {% for count in counts %}
+
+            <li class="collection-item"><img src="/static/avatars/{{count.avatar_src}}" alt=""
+                    class="circle tiny-avatar"> {{ count.display_name }} <span class="secondary-content contrib-pill">{{
+                    count.count }} </span> </li>
+
+            {% endfor %}
+
+
+        </ul>
+    </div>
+    <div class="col s2 "></div>
+</div>
+<script>
+
+    var end = new Date('{{end}}');
+
+    var _second = 1000;
+    var _minute = _second * 60;
+    var _hour = _minute * 60;
+    var _day = _hour * 24;
+    var timer;
+
+    function showRemaining() {
+        var now = new Date();
+        var distance = end - now;
+        if (distance < 0) {
+
+            clearInterval(timer);
+            document.getElementById('countdown').innerHTML = 'Challenge Complete!';
+
+            return;
+        }
+        var days = Math.floor(distance / _day);
+        var hours = Math.floor((distance % _day) / _hour);
+        var minutes = Math.floor((distance % _hour) / _minute);
+        var seconds = Math.floor((distance % _minute) / _second);
+
+        document.getElementById('countdown').innerHTML = days + 'days ';
+        document.getElementById('countdown').innerHTML += hours + 'hrs ';
+        document.getElementById('countdown').innerHTML += minutes + 'mins ';
+        document.getElementById('countdown').innerHTML += seconds + 'secs';
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $( document ).ready(function() {
+        update_counts();
+        showRemaining();
+    });
+    function update_counts(){
+
+
+        $.ajax({
+            type: "POST",
+            url: "/challenges/view_challenge/{{challenge_id}}",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                new_html=''
+                total_completed=0
+                user_count=0
+                data.counts.forEach(function(element){
+               
+                        new_html=new_html+'<li class="collection-item"><img src="/static/avatars/'+element.avatar_src+'" alt=""class="circle tiny-avatar">'+ element.display_name +' <span class="secondary-content contrib-pill">'+element.count+'</span> </li>'
+                    
+                    
+                    user_count=user_count+1
+                    
+                } 
+                );
+                $('#count-ul').html(new_html)
+                console.log(total_completed)
+               
+
+                
+       
+              
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest)
+                console.log(textStatus)
+                console.log(errorThrown)
+            }
+            
+        });
+
+    }
+
+    $( document ).ready(function() {
+        update_counts()
+        setInterval(function(){ 
+          update_counts()
+            
+        }, 5000);
+        setInterval(function(){ 
+            showRemaining()
+              
+          }, 1000);
+    });
+
+
+    
+</script>

@@ -1,3 +1,4 @@
+<script src="/static/js/percentext.js"></script>
 <div class="center margin-top-60p"></div>
 <div class="row">
     <div class="col s3"></div>
@@ -19,11 +20,11 @@
             <div class="col s4">
 
                 <div id="join" style="background-color: #007a86 !important;"
-                    class="pointer big-buttons create-team-button">Join The Team!</div>
+                    class="pointer big-buttons create-team-button">Join</div>
 
             </div>
             <div class="col s4">
-                <div id="decline" class="pointer big-buttons create-team-button">Decline Invitation.</div>
+                <div id="decline" class="pointer big-buttons create-team-button">Decline</div>
             </div>
             <div class="col s2"></div>
         </div>
@@ -38,7 +39,8 @@
 </div>
 
 <script>
-
+    $("#join").percentext({ width: "28.5%" });
+    $("#decline").percentext({ width: "50%" });
     $(".pointer").click(function(){
         console.log({'choice':this.id})
         choice_json={'choice':this.id}

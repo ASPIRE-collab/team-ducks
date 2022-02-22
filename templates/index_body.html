@@ -1,3 +1,4 @@
+<script src="/static/js/percentext.js"></script>
 <div class='height_5p center-block'></div>
   <div class='center  '>
     <div class="title">Drones for Ducks</div>
@@ -7,48 +8,46 @@
     <div class="col s8 " style="border-top-style: double;">
     
 
-    <div class="col s5 ">
+    <div class="index_body_ranks col s5 ">
     <ul class="collection">
       <li class="collection-item collection-top"><span class="collection-top" >Top Contributors</span></li>
     
 
       {% for contributor in top_contributors %}
 
-      <li class="collection-item"> {{ loop.index}} <img src="{{contributor.avatar}}" alt="" class="circle tiny-avatar">  {{ contributor.name }} <span class="secondary-content contrib-pill">{{ contributor.count }}</span>  </li>
+      <li class="collection-item"> {{ loop.index}} <img src="{{contributor.avatar}}" alt="" class="circle tiny-avatar"> <span class="nameellipsis">{{ contributor.name }}</span>  <span class="secondary-content contrib-pill">{{ contributor.count }}</span>  </li>
         
       {% endfor %}
   <li class="center"><a href="/teams/rankings/all" class="waves-effect waves-light btn rankings-button">View Full Rankings</a></li>
       
     </ul>
   </div>
-    <div class="col s7">
+    <div class="blurb_col col s7">
       
-        <p class="blurb_text flow-text">
+        <!-- <p class="blurb_text "> -->
         <img src="/static/images/SunAvatar.jpg" alt="SunAvatar" class="avatar_image">
-        Migrating birds like ducks, geese, and cranes are important parts of many ecosystems along their seasonal travel
-        routes. To ensure there are enough resources to go around, managers of public lands in the Southwestern United
-        States conduct waterfowl surveys to know how many birds to expect over winter. Traditional methods of counting
-        birds out in the field present a lot of challenges and may not be very precise. In addition, counting birds
-        manually from photographs takes a lot of time.
+        <p>Welcome to the Drones for Ducks team page! </p>
+        <p>(If you weren’t linked here from our <a href="https://www.zooniverse.org/projects/rowan-aspire/drones-for-ducks">Zooniverse project</a>, start there!)  </p>
+        <p>Here, you can: </p>
 
-        Our lab at the University of New Mexico is working with the U.S. Fish and Wildlife Service in the Department of
-        Interior to help solve these problems. Currently, we are trying to develop an automated method to count birds
-        from drone imagery using a machine learning algorithm. In order to work, the algorithm needs be "trained" by
-        being fed a lot of different examples of what a "duck" or a "goose" looks like, and that’s where we need help!
-        In this project, you will label different kinds of birds from images taken from drones at places like Bosque del
-        Apache National Wildlife Refuge in central New Mexico. Your labels will help train a computer algorithm to
-        identify and count the birds automatically and ultimately helps federal land managers guide decision making for
-        wildlife conservation!
-      </p>
+        <ul>
+          <li class="list_item">See your overall ranking in the project terms of labels created</li>
+          <li class="list_item">Create or join a team, and view your rankings within the team</li>
+          <li class="list_item">Create team challenges – challenge other members of your team or challenge another team!</li>
+        </ul>
+
+        <p>We hope that a spirit of friendly competition will make the labeling process more fun! </p>
+        <p>Click the buttons below to get started! </p>
+      <!-- </p> -->
       <div class="row">
         <div class="col s6">
           <a href="/teams/create_a_team">
-          <div class="big-buttons create-team-button">Create a Team!</div>
+          <div  class="big-buttons create-team-button"><div id="create-team-button">Create a Team!</div></div>
         </a>
         </div>
         <div class="col s6">
           <a href="/challenges/">
-          <div class="big-buttons create-challenge-button">Already Have a Team?<br>Create a challenge!</div>
+          <div  class="big-buttons create-challenge-button"> <div id="create-challenge-button" >Create a challenge!</div></div>
           </a>
         </div>
       </div>
@@ -58,4 +57,7 @@
     <div class="col s2 "></div>
 
   </div>
-  
+  <script>
+    $("#create-team-button").percentext({ width: "80%", preciseMode: false});
+    $("#create-challenge-button").percentext({ width: "100%", preciseMode: false });
+  </script>
