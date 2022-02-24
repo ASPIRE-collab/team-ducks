@@ -758,6 +758,7 @@ class ExtractsThread(threading.Thread):
             csv_reader = csv.reader(file, delimiter=',', quotechar='"')
             next(csv_reader)
             for row in csv_reader:
+                print(row)
                 self.rows_processed+=1
                 if int(row[0]) not in self.all_classifications_ids:
                     try:
