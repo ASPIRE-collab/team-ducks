@@ -93,6 +93,7 @@ def add_zooniverse_user(user_id,current_users):
     # print(current_users)
     if user_id !='-1':
         users = ZooniverseUser.where(id=user_id)
+        print(users)
         print('getting here 1')
         print(user_id)
         #This returns a generator, but only one time will be generated.
