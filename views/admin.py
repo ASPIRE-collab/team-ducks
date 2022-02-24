@@ -89,23 +89,24 @@ def add_zooniverse_user(user_id,current_users):
     #connect using Panoptes and get user object.
     Panoptes.connect()
     insert_dict={}
-    print(user_id)
+    # print(user_id)
     # print(current_users)
     if user_id !='-1':
+        # print(1)
         users = ZooniverseUser.where(id=user_id)
-        users_list=[]
-        for item in users:
-            users_list.append(item)
-        print(users)
-        print('getting here 1')
-        print(user_id)
-        print(users_list)
+        # users_list=[]
+        # for item in users:
+        #     users_list.append(item)
+        # print(users)
+        # print('getting here 1')
+        # print(user_id)
+        # print(users_list)
         #This returns a generator, but only one time will be generated.
-        if len(users_list)==0:
-            return current_users
-        for item in users_list:
-            print('found user')
-            print(item)
+        # if len(users_list)==0:
+        #     return current_users
+        for item in users:
+            # print('found user')
+            # print(item)
             #If the user has a custom avatar we download it locally, otherwise we set it to the default.
             #We are storing locally to avoid a ton of requests for images when we want to render a team or whatnot.
             if item.avatar_src:
@@ -124,7 +125,7 @@ def add_zooniverse_user(user_id,current_users):
             # if item.id not in current_users:
                 # current_users.append(item.id)
     else:
-        print('getting here')
+        # print('getting here')
         avatar_src="default.png"
         #We store the userdata  in a temporary dictionary.
         insert_dict['avatar_src']=avatar_src
@@ -765,20 +766,18 @@ class ExtractsThread(threading.Thread):
             csv_reader = csv.reader(file, delimiter=',', quotechar='"')
             next(csv_reader)
             for row in csv_reader:
-                print(row)
                 self.rows_processed+=1
                 if int(row[0]) not in self.all_classifications_ids:
                     try:
+                        if row[1].startswith( 'deleted-' ):
+                            row[2]="-1"
                         if row[2]=="":
                             row[2]="-1"
                         if int(row[2]) not in self.zooniverse_user_ids:
                             self.zooniverse_user_ids=add_zooniverse_user(row[2],self.zooniverse_user_ids)
-                        print('insert')
-                        print('row')
                         newClassification = Classifications(id=int(row[0]), zooniverse_user_id=int(row[2]),user_ip=row[3],workflow_id=int(row[4]),workflow_version=float(row[6]),created_at=datetime.strptime(row[7], '%Y-%m-%d %H:%M:%S %Z'),meta_data=json.dumps(json.loads(row[10])),annotations=json.dumps(json.loads(row[11])),subject_data=json.dumps(json.loads(row[12])),subject_id=int(row[13]),ingest_type='export')
                         db.session.add(newClassification)
                         db.session.commit()
-                        print('done')
                         self.rows_inserted+=1
                     except Exception as err:
                         db.session.rollback()
@@ -869,7 +868,7 @@ def update_extracts():#TODO must be admin. check for all routes in here...
                 # print(lines)
                 # csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
                 
-                #TODO move this all to an object or function and use threading to give updates.
+                
                 next(csv_reader)
                 for row in csv_reader:
                    
@@ -878,11 +877,11 @@ def update_extracts():#TODO must be admin. check for all routes in here...
                         try:
                             if row[2]=="":
                                 row[2]="-1"
-                            print(int(row[2]) not in zooniverse_user_ids)
+                            # print(int(row[2]) not in zooniverse_user_ids)
                             if int(row[2]) not in zooniverse_user_ids:
-                                print(zooniverse_user_ids)
+                                # print(zooniverse_user_ids)
                                 zooniverse_user_ids=add_zooniverse_user(row[2],zooniverse_user_ids)
-                                print(zooniverse_user_ids)
+                                # print(zooniverse_user_ids)
                             
                             newClassification = Classifications(id=int(row[0]), zooniverse_user_id=int(row[2]),user_ip=row[3],workflow_id=int(row[4]),workflow_version=float(row[6]),created_at=datetime.strptime(row[7], '%Y-%m-%d %H:%M:%S %Z'),meta_data=json.dumps(json.loads(row[10])),annotations=json.dumps(json.loads(row[11])),subject_data=json.dumps(json.loads(row[12])),subject_id=int(row[13]),ingest_type='export')
                             
