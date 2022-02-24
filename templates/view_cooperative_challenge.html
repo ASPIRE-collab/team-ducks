@@ -1,4 +1,6 @@
 <!-- <div class="col s8 " style="border-top-style: double;"></div> -->
+<script src="/static/js/confetti.browser.min.js"></script>
+
 <div class="row p_top_60">
     <div class="col s2 "></div>
 
@@ -26,7 +28,7 @@
             {% for count in counts %}
 
             <li class="collection-item"><img src="/static/avatars/{{count.avatar_src}}" alt=""
-                    class="circle tiny-avatar"> {{ count.display_name }} <span class="secondary-content contrib-pill">{{
+                    class="margin-lr-10-16 circle tiny-avatar"> {{ count.display_name }} <span class="secondary-content contrib-pill">{{
                     count.count }} of {{goal_number}}</span> </li>
 
             {% endfor %}
@@ -37,7 +39,7 @@
     <div class="col s2 "></div>
 </div>
 <script>
-
+    var percent_complete
     var end = new Date('{{end}}');
 
     var _second = 1000;
@@ -45,16 +47,38 @@
     var _hour = _minute * 60;
     var _day = _hour * 24;
     var timer;
-
+    confetti_not_sent=true
     function showRemaining() {
+        
+        if (percent_complete==undefined){
+            document.getElementById('countdown').innerHTML = 'Checking Status...';
+            return;
+        }
+        if (percent_complete==100){
+            document.getElementById('countdown').innerHTML = '<span style="color:green;font-weight: bold;">Challenge Success!</span>';
+            if (confetti_not_sent){
+                confetti();
+                confetti_not_sent=false
+            }
+            return;
+        }
         var now = new Date();
         var distance = end - now;
         if (distance < 0) {
 
             clearInterval(timer);
-            document.getElementById('countdown').innerHTML = 'Challenge Complete!';
+            if (percent_complete==100){
+                document.getElementById('countdown').innerHTML = '<span style="color:green;font-weight: bold;">Challenge Success!</span>';
+                if (confetti_not_sent){
+                    confetti();
+                    confetti_not_sent=false
+                }
+                return;
+            }else{
+                document.getElementById('countdown').innerHTML = 'Expired';
+                return;
+            }
 
-            return;
         }
         var days = Math.floor(distance / _day);
         var hours = Math.floor((distance % _day) / _hour);
@@ -66,7 +90,6 @@
         document.getElementById('countdown').innerHTML += minutes + 'mins ';
         document.getElementById('countdown').innerHTML += seconds + 'secs';
     }
-
 
 
 
@@ -114,7 +137,7 @@
                 console.log(total_completed)
                 $('#total-goal-number').text(data.goal * user_count)
 
-                var percent_complete = (total_completed / (data.goal * user_count)) * 100;
+                percent_complete = (total_completed / (data.goal * user_count)) * 100;
        
                 $("#prog").css("width", `${Math.floor(percent_complete)}%`);
 

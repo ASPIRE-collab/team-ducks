@@ -1,63 +1,86 @@
 <script src="/static/js/percentext.js"></script>
 <div class='height_5p center-block'></div>
-  <div class='center  '>
-    <div class="title">Drones for Ducks</div>
-  </div>
-  <div class="row">
-    <div class="col s2 "></div>
-    <div class="col s8 " style="border-top-style: double;">
-    
+<div class='center  '>
+  <div class="title">Drones for Ducks</div>
+</div>
+<div style="height:70%" class="row">
+  <div class="col s2 "></div>
+  <div class="col s8 height_100p" style="border-top-style: double;">
+
 
     <div class="index_body_ranks col s5 ">
-    <ul class="collection">
-      <li class="collection-item collection-top"><span class="collection-top" >Top Contributors</span></li>
-    
+      <ul class="collection">
+        <li class="collection-item collection-top"><span class="collection-top">Top Contributors</span></li>
 
-      {% for contributor in top_contributors %}
 
-      <li class="collection-item"> {{ loop.index}} <img src="{{contributor.avatar}}" alt="" class="circle tiny-avatar"> <span class="nameellipsis">{{ contributor.name }}</span>  <span class="secondary-content contrib-pill">{{ contributor.count }}</span>  </li>
-        
-      {% endfor %}
-  <li class="center"><a href="/teams/rankings/all" class="waves-effect waves-light btn rankings-button">View Full Rankings</a></li>
-      
-    </ul>
-  </div>
-    <div class="blurb_col col s7">
-      
-        <!-- <p class="blurb_text "> -->
-        <img src="/static/images/SunAvatar.jpg" alt="SunAvatar" class="avatar_image">
-        <p>Welcome to the Drones for Ducks team page! </p>
-        <p>(If you weren’t linked here from our <a href="https://www.zooniverse.org/projects/rowan-aspire/drones-for-ducks">Zooniverse project</a>, start there!)  </p>
-        <p>Here, you can: </p>
+        {% for contributor in top_contributors %}
 
-        <ul>
-          <li class="list_item">See your overall ranking in the project terms of labels created</li>
-          <li class="list_item">Create or join a team, and view your rankings within the team</li>
-          <li class="list_item">Create team challenges – challenge other members of your team or challenge another team!</li>
-        </ul>
+        <li class="collection-item"> {{ loop.index}} <img src="{{contributor.avatar}}" alt=""
+            class="circle tiny-avatar"> <span class="nameellipsis">{{ contributor.name }}</span> <span
+            class="secondary-content contrib-pill">{{ contributor.count }}</span> </li>
 
-        <p>We hope that a spirit of friendly competition will make the labeling process more fun! </p>
-        <p>Click the buttons below to get started! </p>
-      <!-- </p> -->
-      <div class="row">
+        {% endfor %}
+        <li class="center"><a href="/teams/rankings/all" class="waves-effect waves-light btn rankings-button">View Full
+            Rankings</a></li>
+
+      </ul>
+    </div>
+    <div style="position: relative;" class="blurb_col col s7 height_100p">
+
+      <!-- <p class="blurb_text "> -->
+      <img src="/static/images/SunAvatar.jpg" alt="SunAvatar" class="avatar_image">
+      <p>Welcome to the Drones for Ducks team page! </p>
+      <p>(If you weren’t linked here from our <a
+          href="https://www.zooniverse.org/projects/rowan-aspire/drones-for-ducks">Zooniverse project</a>, start there!)
+      </p>
+      <p>Here, you can: </p>
+
+      <ul>
+        <li class="list_item">See your overall ranking in the project terms of labels created</li>
+        <li class="list_item">Create or join a team, and view your rankings within the team</li>
+        <li class="list_item">Create team challenges – challenge other members of your team or challenge another team!
+        </li>
+      </ul>
+
+      <p>We hope that a spirit of friendly competition will make the labeling process more fun! </p>
+
+      <p>If you don't have an account <span id="create-one">create one</span> to become a team leader. If you already
+        have an account click the buttons below to get started!</p>
+
+
+
+      <div  class="row">
         <div class="col s6">
           <a href="/teams/create_a_team">
-          <div  class="big-buttons create-team-button"><div id="create-team-button">Create a Team!</div></div>
-        </a>
+            <div class="big-buttons create-team-button">
+              <div id="create-team-button">Create a Team!</div>
+            </div>
+          </a>
         </div>
         <div class="col s6">
           <a href="/challenges/">
-          <div  class="big-buttons create-challenge-button"> <div id="create-challenge-button" >Create a challenge!</div></div>
+            <div class="big-buttons create-challenge-button">
+              <div id="create-challenge-button">Create a challenge!</div>
+            </div>
           </a>
         </div>
       </div>
     </div>
-    </div>
-    
-    <div class="col s2 "></div>
-
   </div>
-  <script>
-    $("#create-team-button").percentext({ width: "80%", preciseMode: false});
-    $("#create-challenge-button").percentext({ width: "100%", preciseMode: false });
-  </script>
+
+  <div class="col s2 "></div>
+
+</div>
+<script>
+  $("#create-team-button").percentext({ width: "80%", preciseMode: false });
+  $("#create-challenge-button").percentext({ width: "100%", preciseMode: false });
+
+  $('#create-one').click(function () {
+    login_modal = M.Modal.getInstance($('#login-modal'));
+    login_modal.close();
+    reset_modal = M.Modal.getInstance($('#reset-pass-modal'));
+    reset_modal.close();
+    reset_modal = M.Modal.getInstance($('#create-pass-modal'));
+    reset_modal.open();
+  })
+</script>

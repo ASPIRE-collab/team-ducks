@@ -1,13 +1,16 @@
 from flask import Blueprint, render_template, request
 from flask_login import current_user, login_required
 from app import app_config 
-from sqlalchemy import func
+from sqlalchemy import func, desc, asc
 from db_models import Classifications, Teams,Challenges,ChallengeCounts,ZooniverseUsers,TeamMembers,db
 from views.admin import render_index,add_zooniverse_user,get_current_user_ids
 from uuid import uuid4
 import datetime
 import json
 
+
+
+ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
 
 # Blueprint Configuration
 challenges_bp = Blueprint(
@@ -23,10 +26,12 @@ def my_challenges():
     if request.method == 'GET':
         challenges_obj={'challenges':[]}
         my_challenges=db.session.query(Teams.name,Challenges.name,Challenges.id).filter(Teams.id==Challenges.team_id).filter(Teams.owner_id==current_user.id).all()
+        print(db.session.query(Teams.name,Challenges.name,Challenges.id).filter(Teams.id==Challenges.team_id).filter(Teams.owner_id==current_user.id))
         for my_challenge in my_challenges:
+            print(my_challenge)
             challenges_obj['challenges'].append({'team_name':my_challenge[0],'challenge_name':my_challenge[1],'challenge_id':my_challenge[2]})
-            body=render_template('my_challenges.html',challenges=challenges_obj)
-            return render_index(body)
+        body=render_template('my_challenges.html',challenges=challenges_obj)
+        return render_index(body)
 
 
 @challenges_bp.route("/" , methods=['GET','POST']) 
@@ -40,7 +45,7 @@ def root():
             return render_index(body)
 
         else:
-            body=render_template('general_error.html',error_string='You cannot create a challenge unless you have a team.')
+            body=render_template('general_error.html',error_string='You cannot create a challenge unless you have a team.<a style="color:#ba0c2f;" href="/teams/create_a_team">Click here to create one!</a>')
             return render_index(body)
 
 
@@ -168,7 +173,7 @@ def create_challenge(challenge_type):
                 body=render_template('create_cooperative_type.html',challenge_type=challenge_type,teams=teams)
                 return render_index(body)
             else:
-                body=render_template('general_error.html',error_string='You cannot create a challenge unless you have a team.')
+                body=render_template('general_error.html',error_string='You cannot create a challenge unless you have a team.<a style="color:#ba0c2f;" href="/teams/create_a_team">Click here to create one!</a>')
                 return render_index(body)
         elif challenge_type=='competitive':
             my_teams=db.session.query(Teams).filter(Teams.owner_id==current_user.id).all()
@@ -180,7 +185,7 @@ def create_challenge(challenge_type):
                 body=render_template('create_competitive_type.html',challenge_type=challenge_type,teams=teams)
                 return render_index(body)
             else:
-                body=render_template('general_error.html',error_string='You cannot create a challenge unless you have a team.')
+                body=render_template('general_error.html',error_string='You cannot create a challenge unless you have a team.<a style="color:#ba0c2f;" href="/teams/create_a_team">Click here to create one!</a>')
                 return render_index(body)
         else:
             body=render_template('general_error.html',error_string='Comming Soon!')
@@ -232,12 +237,25 @@ def create_challenge(challenge_type):
 
 @challenges_bp.route("/view_challenge/<challenge_id>" , methods=['GET','POST']) 
 def view_challenge(challenge_id):
-    challenge_counts=db.session.query(ChallengeCounts,ZooniverseUsers).filter(ChallengeCounts.challenge_id==challenge_id).filter(ZooniverseUsers.id==ChallengeCounts.user_id).all()
-    counts=[]
-    for count in challenge_counts:
-        counts.append({'display_name':count[1].display_name,'avatar_src':count[1].avatar_src,'count':count[0].count})
-    print(counts)
+
+   
     this_challenge=db.session.query(Challenges,Teams).filter(Challenges.id==int(challenge_id)).filter(Teams.id==Challenges.team_id).first()
+    if this_challenge[0].type=="cooperative": 
+        challenge_counts=db.session.query(ChallengeCounts,ZooniverseUsers).filter(ChallengeCounts.challenge_id==challenge_id).filter(ZooniverseUsers.id==ChallengeCounts.user_id).order_by(asc(ZooniverseUsers.display_name)).all()
+
+    elif this_challenge[0].type=="competitive": 
+        challenge_counts=db.session.query(ChallengeCounts,ZooniverseUsers).filter(ChallengeCounts.challenge_id==challenge_id).filter(ZooniverseUsers.id==ChallengeCounts.user_id).order_by(desc(ChallengeCounts.count)).all()
+    else:
+        challenge_counts=db.session.query(ChallengeCounts,ZooniverseUsers).filter(ChallengeCounts.challenge_id==challenge_id).filter(ZooniverseUsers.id==ChallengeCounts.user_id).all()
+    counts=[]
+    order=1
+    for count in challenge_counts:
+        if this_challenge[0].type=="competitive":
+            counts.append({'order':ordinal(order),'display_name':count[1].display_name,'avatar_src':count[1].avatar_src,'count':count[0].count})
+            order+=1
+        else:
+            counts.append({'display_name':count[1].display_name,'avatar_src':count[1].avatar_src,'count':count[0].count})
+    print(counts)
     if request.method == 'GET':
         if this_challenge[0].type=="cooperative": 
             if this_challenge:

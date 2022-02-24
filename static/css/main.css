@@ -664,7 +664,14 @@ textarea.materialize-textarea:focus:not([readonly]) + label {
   border-style: solid;
   border-width: 1px;
 }
-
+.margin-lr-10-16{
+  margin-left: 10px;
+  margin-right: 16px;
+}
+.ordinal{
+  display: inline-block;
+  width: 30px;
+}
 .p_top_60{
   padding-top: 60px;
 }
@@ -867,4 +874,20 @@ display: none;
 
 
 /* @media (min-width:960px) { css... }  */
+
+.grey-title{
+  text-align: center;
+  text-transform: uppercase;
+  color: #585858;
+  padding-top: 22px;
+}
+
+#create-if-you-want{
+  color: #ba0c2f;
+cursor: pointer;
+}
+#create-one{
+  color: #ba0c2f;
+cursor: pointer;
+}
 

@@ -74,6 +74,7 @@ def get_current_user_ids():
     return return_list
 
 def render_index(body):
+
     return render_template('index.html' , is_authenticated=current_user.is_authenticated, is_admin=is_admin(current_user), body=body)
 
 def add_zooniverse_user(user_id,current_users):
@@ -466,7 +467,7 @@ def create_user():
             role = request.form['role']
             user = db.session.query(User).filter(User.email == email).first()
         
-            headertitle='Set your Drones for Ducks password.'
+            headertitle='Set Drones for Ducks team page password.'
             blurb='An API account has been created for you. Before you log in you must change your password.'
             if user:
                 error_string="User with email:"+email+" exists."
@@ -581,7 +582,7 @@ def password_reset_request():
         if user_row:
             #This if is used to prevent any sql shenanigans
             if user_row.email==email:
-                headertitle='Change your Drones for Ducks password.'
+                headertitle='Set Drones for Ducks team page password.'
                 blurb='A request was made for a password reset link. If you did not request this, please disregard.'
                 send_password_reset_email(user_row,headertitle,blurb)
                 return render_template('general_message.html',error_string='An e-mail has been set to '+email)
@@ -592,6 +593,52 @@ def password_reset_request():
     else:
         return render_template('general_error.html',error_string='Unknown e-mail address.')
 
+
+
+@admin_bp.route("/account_request", methods=['POST'])
+def account_request():
+    """Sends and email with instructions on creating a password.
+
+    Returns:
+        HTML: Success message or Error.
+    """
+    if 'email' in request.form:
+        email = request.form['email']
+        user_row=db.session.query(User).filter(User.email==email).first()
+        if user_row:
+            return render_template('general_error.html',error_string='An account with this e-mail exists. Please change your password using the password reset button under login.')
+        else:
+            #create account
+            email = request.form['email']
+            if 'first_name' in request.form:
+                first_name = request.form['first_name']
+            else:
+                first_name=""
+            if 'last_name' in request.form:
+                last_name = request.form['last_name']
+            else:
+                last_name=""
+        
+            headertitle='Set Drones for Ducks team page password.'
+            blurb='An account has been created for you for '+request.host+'. Before you log in you must change your password.'
+            try:
+                newUser=User(email=email,first_name=first_name,last_name=last_name,user_hash='----',user_salt='-')
+                print(newUser)
+                db.session.add(newUser)
+                db.session.flush()
+                db.session.refresh(newUser)
+                print("addrole")
+                newRole=UserRoles(user_id=newUser.id,role_id=2)
+                print(newRole)
+                db.session.add(newRole)
+                db.session.commit()
+                send_password_reset_email(newUser,headertitle,blurb)
+                return render_template('general_message.html',error_string='An e-mail with further instructions has been set to '+email)
+            except Exception as e:
+                error_string="Insert into db failed. Error:"+str(e)
+                return render_template('general_error.html',error_string=error_string)
+    else:
+        return render_template('general_error.html',error_string='Malformed e-mail address.')
 
 
 @admin_bp.route('/logout')
@@ -650,7 +697,11 @@ def extracts():
             zooniverse_user_id="-1"
         if int(zooniverse_user_id) not in current_users:
             current_users=add_zooniverse_user(zooniverse_user_id,current_users)
-        
+        existing_classification=db.session.query(Classifications).filter(Classifications.id==int(classifications_id)).first()
+        if existing_classification:
+            data = {'status': 'RECEIVED', 'message': 'SUCCESS'}
+            print('exists')
+            return make_response(jsonify(data), 201)
         
         newClassification = Classifications(id=int(classifications_id), 
         zooniverse_user_id=int(zooniverse_user_id),

@@ -8,11 +8,11 @@
 
 
         <div class="center">
-            <img style="width:200px" src="/static/images/3ducks-coop-holding-hands.svg">
+            <img style="width:200px" src="/static/images/ducks_running.svg">
         </div>
 
         <ul  class="collection">
-            <li class="collection-item collection-top"><span class="collection-top"><span class="challenge-title">Team Goal:</span> </span> <span class="challenge-title time-remaining" >Remaining Time:</span> <span id="countdown"></span>
+            <li class="collection-item collection-top"><span class="collection-top"> </span> <span class="challenge-title time-remaining" >Remaining Time:</span> <span id="countdown"></span>
             </li>
         </ul>
 
@@ -24,8 +24,8 @@
 
             {% for count in counts %}
 
-            <li class="collection-item"><img src="/static/avatars/{{count.avatar_src}}" alt=""
-                    class="circle tiny-avatar"> {{ count.display_name }} <span class="secondary-content contrib-pill">{{
+            <li class="collection-item"><span class="ordinal">{{ count.order }}</span><img src="/static/avatars/{{count.avatar_src}}" alt=""
+                    class="margin-lr-10-16 circle tiny-avatar"> {{ count.display_name }} <span class="secondary-content contrib-pill">{{
                     count.count }} </span> </li>
 
             {% endfor %}
@@ -96,8 +96,8 @@
                 total_completed=0
                 user_count=0
                 data.counts.forEach(function(element){
-               
-                        new_html=new_html+'<li class="collection-item"><img src="/static/avatars/'+element.avatar_src+'" alt=""class="circle tiny-avatar">'+ element.display_name +' <span class="secondary-content contrib-pill">'+element.count+'</span> </li>'
+                        console.log(element)
+                        new_html=new_html+'<li class="collection-item"><span class="ordinal">'+element.order+'</span><img src="/static/avatars/'+element.avatar_src+'" alt=""class="margin-lr-10-16 circle tiny-avatar">'+ element.display_name +' <span class="secondary-content contrib-pill">'+element.count+'</span> </li>'
                     
                     
                     user_count=user_count+1

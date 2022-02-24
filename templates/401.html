@@ -16,7 +16,19 @@
 <div class="row center error_row" style="margin-top: 0px!important;">
     <div class="col s2 "></div>
     <div class="col s8 ">
-        If You Have an Account, Try Logging In!
+        <div>If You have an account, try logging in!</div>
+        <div>If you would like to create an account , <span id="create-if-you-want">Click Here!</span></div>
     </div>
     <div class="col s2 "></div>
 </div>    
+
+<script>
+    $('#create-if-you-want').click(function () {
+        login_modal = M.Modal.getInstance($('#login-modal'));
+        login_modal.close();
+        reset_modal = M.Modal.getInstance($('#reset-pass-modal'));
+        reset_modal.close();
+        reset_modal = M.Modal.getInstance($('#create-pass-modal'));
+        reset_modal.open();
+      })
+</script>
