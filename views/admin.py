@@ -93,11 +93,17 @@ def add_zooniverse_user(user_id,current_users):
     # print(current_users)
     if user_id !='-1':
         users = ZooniverseUser.where(id=user_id)
+        users_list=[]
+        for item in users:
+            users_list.append(item)
         print(users)
         print('getting here 1')
         print(user_id)
+        print(users_list)
         #This returns a generator, but only one time will be generated.
-        for item in users:
+        if len(users_list)==0:
+            return current_users
+        for item in users_list:
             print('found user')
             print(item)
             #If the user has a custom avatar we download it locally, otherwise we set it to the default.
@@ -826,6 +832,10 @@ def upload_extracts():
 @admin_required
 def progress(thread_id):
     global exporting_threads
+    if thread_id in exporting_threads:
+        print('found')
+    else:
+        print('not found')
     return {"processed":exporting_threads[thread_id].rows_processed,"inserted":exporting_threads[thread_id].rows_inserted,"running":exporting_threads[thread_id].running,"total":exporting_threads[thread_id].total_count}
 
 @admin_bp.route('/progress_viewer/<int:thread_id>')
