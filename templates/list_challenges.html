@@ -1,0 +1,27 @@
+<div class="center margin-top-60p"></div>
+<div class="row">
+    <div class="col s2"></div>
+    <div class="col s8 unm_font center">
+        <div class="row">
+            <div class="center margin-top-60p">
+
+                <div style="font-size: 27px;">Click on Challenge to view it.</div>
+            </div>
+            {% for challenge in challenges %}
+            <div class="col s6">
+                <div style="font-size: 27px;">
+                    <a href="/challenges/view_challenge/{{challenge.id}}">
+                        <div class="col s12 user_col">
+                            <div> {{ challenge.name }}</div>
+                        </div>
+                    </a>
+
+
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col s2"></div>
+</div>

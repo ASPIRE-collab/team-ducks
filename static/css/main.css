@@ -269,6 +269,17 @@ color:#868686;
     padding: 6px;
     border-radius: 9px;
 }
+
+.contrib-pill-team {
+  background-color: #ba0c2f;
+  color: white;
+  padding: 0px;
+  border-radius: 7px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
+}
+
 .rankings-button{
     margin: 11px;
     height: 27px;

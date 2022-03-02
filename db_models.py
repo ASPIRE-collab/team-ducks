@@ -104,6 +104,13 @@ class Challenges(db.Model, UserMixin):
     public=db.Column(db.Boolean)
     type = db.Column(db.String(50))
 
+class TeamChallenges(db.Model, UserMixin):
+    __tablename__ = 'team_challenges'
+    id = db.Column(db.Integer, primary_key=True)
+    challenge_id = db.Column(db.Integer)
+    team_id = db.Column(db.Integer)
+
+
 class ChallengeCounts(db.Model, UserMixin):
     __tablename__ = 'challenge_counts'
     id = db.Column(db.Integer, primary_key=True)

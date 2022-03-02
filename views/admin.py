@@ -19,8 +19,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from flask_login.utils import wraps
 from uuid import uuid4
 from app import login_manager,app_config,static_path 
-from sqlalchemy import func
-from db_models import ChallengeCounts, TeamMembers, Teams, User, Roles,UserRoles,PasswordResetTokens,Classifications,db,ZooniverseUsers,Classifications,CountsAll,Challenges
+from sqlalchemy import func, or_
+from db_models import ChallengeCounts, TeamChallenges, TeamMembers, Teams, User, Roles,UserRoles,PasswordResetTokens,Classifications,db,ZooniverseUsers,Classifications,CountsAll,Challenges
 from datetime import datetime,timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -180,14 +180,17 @@ def update_challenge_rankings(user_id):
 
     #get list of all challenges that this user is currently a part of.
     #select * from teams,challenges,team_members ,zooniverse_users where challenges.team_id =teams.id and team_members.team_id =teams.id and team_members.zooniverse_user_id =zooniverse_users.id and start_datetime <'2022-02-09 10:25:06' and end_datetime > '2022-02-09 10:25:06' and zooniverse_users.id=2426149;
-    current_challenges=db.session.query(Challenges.id
+    
+    current_non_team_challenges=db.session.query(Challenges.id
     ).filter(Challenges.team_id==Teams.id
     ).filter(Teams.id==TeamMembers.team_id
     ).filter(TeamMembers.zooniverse_user_id==ZooniverseUsers.id
     ).filter(Challenges.start_datetime<=now_timestamp
     ).filter(Challenges.end_datetime>=now_timestamp
-    ).filter(ZooniverseUsers.id==user_id)
-    for challenge in current_challenges:
+    ).filter(ZooniverseUsers.id==user_id
+    ).filter(or_(Challenges.type == 'cooperative', Challenges.type == 'competitive')
+    ).all()
+    for challenge in current_non_team_challenges:
         exists=db.session.query(ChallengeCounts).filter(ChallengeCounts.challenge_id==challenge[0]).filter(ChallengeCounts.user_id==user_id).first()
         if exists:
             try:
@@ -207,6 +210,49 @@ def update_challenge_rankings(user_id):
                 db.session.rollback()
                 db.session.flush()
                 return e
+
+
+    current_team_challenges=db.session.query(Challenges
+    
+    ).filter(Teams.id==TeamChallenges.team_id
+    ).filter(Challenges.id==TeamChallenges.challenge_id
+    ).filter(TeamMembers.zooniverse_user_id==ZooniverseUsers.id
+    ).filter(Challenges.start_datetime<=now_timestamp
+    ).filter(Challenges.end_datetime>=now_timestamp
+    ).filter(ZooniverseUsers.id==user_id
+    ).filter(Challenges.type == 'team'
+    ).all()
+    for challenge in current_team_challenges:
+        print(challenge)
+        exists=db.session.query(ChallengeCounts).filter(ChallengeCounts.challenge_id==challenge.id).filter(ChallengeCounts.user_id==user_id).first()
+        if exists:
+            try:
+                updated_user_row = db.session.query(ChallengeCounts).filter(ChallengeCounts.challenge_id==challenge.id).filter(ChallengeCounts.user_id==user_id).update(dict(count=exists.count+1))
+                db.session.commit()
+            except Exception as e:
+                print(e)
+                db.session.rollback()
+                db.session.flush()
+        else:
+            try:
+                newcount=ChallengeCounts(challenge_id=challenge.id,user_id=user_id,count=1)
+                db.session.add(newcount)
+                db.session.commit()
+            except Exception as e:
+                print(e)
+                db.session.rollback()
+                db.session.flush()
+                return e
+#Check for team challenges
+    # current_team_challenges=db.session.query(Challenges.id
+    # ).filter(Challenges.team_id==Teams.id
+    # ).filter(Teams.id==TeamMembers.team_id
+    # ).filter(TeamMembers.zooniverse_user_id==ZooniverseUsers.id
+    # ).filter(Challenges.start_datetime<=now_timestamp
+    # ).filter(Challenges.end_datetime>=now_timestamp
+    # ).filter(ZooniverseUsers.id==user_id
+    # ).filter(Challenges.type == 'Team')
+    # ).all()
 
 
 def update_all_rankings():

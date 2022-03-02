@@ -8,7 +8,7 @@
 
 
         <div class="center">
-            <img style="width:200px" src="/static/images/ducks_running.svg">
+            <img style="width:200px" src="/static/images/3ducks-team.svg">
         </div>
 
         <ul  class="collection">
@@ -24,8 +24,7 @@
 
             {% for count in counts %}
 
-            <li class="collection-item"><span class="ordinal">{{ count.order }}</span><img src="/static/avatars/{{count.avatar_src}}" alt=""
-                    class="margin-lr-10-16 circle tiny-avatar"> {{ count.display_name }} <span class="secondary-content contrib-pill">{{
+            <li class="collection-item"><span class="ordinal">{{ count.order }}</span> {{ count.name }} <span class="secondary-content contrib-pill-team ">{{
                     count.count }} </span> </li>
 
             {% endfor %}
@@ -51,7 +50,7 @@
         if (distance < 0) {
 
             clearInterval(timer);
-            document.getElementById('countdown').innerHTML = 'Expired';
+            document.getElementById('countdown').innerHTML = 'Challenge Complete!';
 
             return;
         }
@@ -97,7 +96,7 @@
                 user_count=0
                 data.counts.forEach(function(element){
                         console.log(element)
-                        new_html=new_html+'<li class="collection-item"><span class="ordinal">'+element.order+'</span><img src="/static/avatars/'+element.avatar_src+'" alt=""class="margin-lr-10-16 circle tiny-avatar">'+ element.display_name +' <span class="secondary-content contrib-pill">'+element.count+'</span> </li>'
+                        new_html=new_html+'<li class="collection-item"><span class="ordinal">'+element.order+'</span><img src="/static/avatars/'+element.avatar_src+'" alt=""class="margin-lr-10-16 circle tiny-avatar">'+ element.display_name +' <span class="secondary-content contrib-pill-team ">'+element.count+'</span> </li>'
                     
                     
                     user_count=user_count+1
@@ -125,10 +124,10 @@
 
     $( document ).ready(function() {
         update_counts()
-        setInterval(function(){ 
-          update_counts()
-            
-        }, 5000);
+        //setInterval(function(){ 
+        //  update_counts()
+        //    
+        //}, 5000);
         setInterval(function(){ 
             showRemaining()
               
