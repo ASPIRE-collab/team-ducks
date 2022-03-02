@@ -64,7 +64,7 @@ def root():
 def list_challenges(type):
     if type=='current':
         #select * from challenges where public=True and end_datetime>'2022-03-02 1:50:00';
-        now = datetime.datetime.now() # current date and time
+        now = datetime.datetime.utcnow() # current date and time
         now_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
         current_public=db.session.query(Challenges).filter(Challenges.public==True).filter(Challenges.end_datetime>now_timestamp).all()
         current_public_list=[]
@@ -74,7 +74,7 @@ def list_challenges(type):
         return render_index(body)
     if type=='past':
         #select * from challenges where public=True and end_datetime>'2022-03-02 1:50:00';
-        now = datetime.datetime.now() # current date and time
+        now = datetime.datetime.utcnow() # current date and time
         now_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
         current_public=db.session.query(Challenges).filter(Challenges.public==True).filter(Challenges.end_datetime<now_timestamp).all()
         current_public_list=[]
@@ -112,7 +112,7 @@ def update_challenge_counts(challenge_id,user_id,new_count):
 
 def remove_user_challenge_counts(team_id,remove_user_id):
     #Next we get all current challenges for this team;
-    now = datetime.datetime.now() # current date and time
+    now = datetime.datetime.utcnow() # current date and time
     now_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
     
     current_challenges=db.session.query(Challenges).filter(Challenges.team_id==team_id).filter(Challenges.start_datetime<=now_timestamp).filter(Challenges.end_datetime>=now_timestamp).all()
@@ -140,7 +140,7 @@ def normalize_challenge_counts(team_id):
         team_member_ids.append(team_member.id)
 
     #Next we get all current challenges for this team;
-    now = datetime.datetime.now() # current date and time
+    now = datetime.datetime.utcnow() # current date and time
     now_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
     print(team_member_ids)
     current_challenges=db.session.query(Challenges).filter(Challenges.team_id==team_id).filter(Challenges.start_datetime<=now_timestamp).filter(Challenges.end_datetime>=now_timestamp).all()
@@ -261,9 +261,8 @@ def create_challenge(challenge_type):
                 db.session.refresh(new_challenge)
                 print(new_challenge.id)
                 for team_member in team_members:
-                    print('filter')
-                    print(db.session.query(ChallengeCounts).filter(challenge_id=new_challenge.id,user_id=team_member.id))
-                    exists=db.session.query(ChallengeCounts).filter(challenge_id=new_challenge.id,user_id=team_member.id).first()
+                   
+                    exists=db.session.query(ChallengeCounts).filter(ChallengeCounts.challenge_id==new_challenge.id,ChallengeCounts.user_id==team_member.id).first()
                     if not exists:
                         new_challenge_member=ChallengeCounts(challenge_id=new_challenge.id,user_id=team_member.id,count =0)
                         db.session.add(new_challenge_member)

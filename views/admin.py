@@ -175,7 +175,7 @@ def update_single_user_rankings(user_id):
 def update_challenge_rankings(user_id):
     from datetime import datetime
 
-    now = datetime.now() # current date and time
+    now = datetime.utcnow() # current date and time
     now_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
 
     #get list of all challenges that this user is currently a part of.

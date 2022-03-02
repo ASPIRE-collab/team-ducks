@@ -40,8 +40,9 @@
 </div>
 <script>
     var percent_complete
-    var end = new Date('{{end}}');
-
+    console.log('{{end}}')
+    var end = new Date('{{end}} UTC');
+    console.log(end)
     var _second = 1000;
     var _minute = _second * 60;
     var _hour = _minute * 60;

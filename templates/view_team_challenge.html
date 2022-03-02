@@ -36,7 +36,7 @@
 </div>
 <script>
 
-    var end = new Date('{{end}}');
+    var end = new Date('{{end}} UTC');
 
     var _second = 1000;
     var _minute = _second * 60;
@@ -123,11 +123,11 @@
     }
 
     $( document ).ready(function() {
-        update_counts()
+        //update_counts()
         //setInterval(function(){ 
-        //  update_counts()
-        //    
-        //}, 5000);
+         // update_counts()
+            
+       // }, 5000);
         setInterval(function(){ 
             showRemaining()
               
