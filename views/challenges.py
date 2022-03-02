@@ -259,7 +259,10 @@ def create_challenge(challenge_type):
                 db.session.add(new_challenge)
                 db.session.flush()
                 db.session.refresh(new_challenge)
+                print(new_challenge.id)
                 for team_member in team_members:
+                    print('filter')
+                    print(db.session.query(ChallengeCounts).filter(challenge_id=new_challenge.id,user_id=team_member.id))
                     exists=db.session.query(ChallengeCounts).filter(challenge_id=new_challenge.id,user_id=team_member.id).first()
                     if not exists:
                         new_challenge_member=ChallengeCounts(challenge_id=new_challenge.id,user_id=team_member.id,count =0)
