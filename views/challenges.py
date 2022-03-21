@@ -401,7 +401,10 @@ def view_challenge(challenge_id):
             if this_challenge[0].type=="competitive": 
                 if this_challenge:
                     is_public=this_challenge[0].public
-                    is_owner=current_user.id==this_challenge[1].owner_id
+                    if current_user.is_authenticated:
+                        is_owner=current_user.id==this_challenge[1].owner_id
+                    else:
+                        is_owner=False
                     goal_number=this_challenge[0].goal_number
                     if is_public or is_owner:
 

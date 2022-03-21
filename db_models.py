@@ -124,7 +124,7 @@ db.create_all()
 db.session.commit()
 
 #Roles standardization
-roles_list=[{'id':1,"role_name":'Admin'},{'id':2,"role_name":'Data Viewer'}]
+roles_list=[{'id':1,"role_name":'Admin'},{'id':2,"role_name":'Team Leader'}]
 #Add standard groups if missing or incorrect:
 all_roles = db.session.query(Roles).all()
 db_roles_list=[]

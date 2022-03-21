@@ -323,11 +323,21 @@ color:#868686;
     left: 0;
     bottom: 0;
     background-color: #ba0c2f;
-    -webkit-transition: width .3s linear;
-    transition: width .3s linear;
+    -webkit-transition: width .5s linear;
+    transition: width .5s linear;
   }
   
+  .progress_user {
 
+    background-color: #a7a8aa00 !important;
+
+  }
+
+  .progress .determinate_user {
+
+    background-color: #ffffff00 !important;
+ 
+  }
 .custom-file {
     position: relative;
     display: inline-block;
@@ -902,3 +912,6 @@ cursor: pointer;
 cursor: pointer;
 }
 
+.width-100-pct{
+  width: 100%;
+}
