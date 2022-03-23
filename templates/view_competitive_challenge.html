@@ -1,116 +1,145 @@
 <!-- <div class="col s8 " style="border-top-style: double;"></div> -->
+<script src="/static/js/confetti.browser.min.js"></script>
+<script src="/static/js/jquery.tinysort.min.js"> </script>
 <div class="row p_top_60">
     <div class="col s2 "></div>
-
-
-
     <div class="col s8  ">
-
-
         <div class="center">
-            <img style="width:200px" src="/static/images/ducks_running.svg">
+            <img style="width:200px" src="/static/images/3ducks-coop-holding-hands.svg">
         </div>
-
-        <ul  class="collection">
-            <li class="collection-item collection-top"><span class="collection-top"> </span> <span class="challenge-title time-remaining" >Remaining Time:</span> <span id="countdown"></span>
+        <ul class="collection">
+            <li class="collection-item collection-top"><span class="collection-top"> </span> <span
+                    class="challenge-title time-remaining">Remaining Time To Compete:</span> <span
+                    id="countdown"></span>
             </li>
         </ul>
-
-     
-   
+        <div id="progdiv" class="progress" style="height: 0px;">
+            <div id="prog" class="determinate" style="width: 0px"></div>
+        </div>
         <ul id="count-ul" class="collection">
-
-
-
             {% for count in counts %}
-
-            <li class="collection-item"><span class="ordinal">{{ count.order }}</span><img src="/static/avatars/{{count.avatar_src}}" alt=""
-                    class="margin-lr-10-16 circle tiny-avatar"> {{ count.display_name }} <span class="secondary-content contrib-pill">{{
-                    count.count }} </span> </li>
-
+            <li id="li_{{ count.display_name }}" class="collection-item width-100-pct" count="{{count.count}}"><span
+                    id="order_{{ count.display_name }}" class="ordinal">{{ count.order }}</span><img
+                    src="/static/avatars/{{count.avatar_src}}" alt="" class="circle tiny-avatar"> {{ count.display_name
+                }} <span id="pill_text_{{ count.display_name }}" class="secondary-content contrib-pill">{{count.count }}
+                </span>
+                <div id="progdiv" class="progress progress_user" style="height:50px;">
+                    <div id="prog_{{ count.display_name }}" class="determinate determinate_user"
+                        style="height:50px;width:0"><img id="running_{{ count.display_name }}"
+                            style="width: 40px;float: right;" src="/static/images/duck_running_1.svg" alt="running"><img
+                            id="winning_{{ count.display_name }}" style="width: 40px;float: right;display:none"
+                            src="/static/images/duck_winning_1.svg" alt="running"></div>
+                </div>
+            </li>
             {% endfor %}
-
-
         </ul>
     </div>
     <div class="col s2 "></div>
 </div>
 <script>
 
-    var end = new Date('{{end}} UTC');
-
+    //global vars
+    var percent_complete
+    var end = new Date('{{end}} UTC'); //challenge end date
     var _second = 1000;
     var _minute = _second * 60;
     var _hour = _minute * 60;
     var _day = _hour * 24;
     var timer;
+    var check_count = 1
+    var ul_height = 0
+    var confetti_not_sent = true
 
+    //showRemaining shows how much time is remaining in the challenge and prints 'Challenge Is Complete!' when current time is greater than the challenge end date.
     function showRemaining() {
         var now = new Date();
         var distance = end - now;
         if (distance < 0) {
-
             clearInterval(timer);
-            document.getElementById('countdown').innerHTML = 'Expired';
-
+            document.getElementById('countdown').innerHTML = 'Challenge Is Complete!';
             return;
         }
         var days = Math.floor(distance / _day);
         var hours = Math.floor((distance % _day) / _hour);
         var minutes = Math.floor((distance % _hour) / _minute);
         var seconds = Math.floor((distance % _minute) / _second);
-
         document.getElementById('countdown').innerHTML = days + 'days ';
         document.getElementById('countdown').innerHTML += hours + 'hrs ';
         document.getElementById('countdown').innerHTML += minutes + 'mins ';
         document.getElementById('countdown').innerHTML += seconds + 'secs';
     }
 
+    //Sort the li elements. we have a div that changes every cycle. It is hidden with a height of 0px (Do NOT display:none)
+    //This way we can sort the li elements after the ducks finish running.
+    const transition = document.querySelector('.determinate');
+    transition.addEventListener('transitionend', () => {
+        var $Ul = $('ul#count-ul');
+        console.log($Ul.height())
+        if (ul_height == 0) {
+            ul_height = $Ul.height()
+        }
+        console.log(ul_height)
+        $Ul.css({ position: 'relative', height: ul_height, display: 'block' });
+        var iLnH;
+        var $Li = $('ul#count-ul>li');
+        $Li.each(function (i, el) {
+            elm_count = el.getAttribute('order')
+            elm_id = el.id.substring(3);
+            var iY = $(el).position().top;
+            $.data(el, 'h', iY);
+            if (i === 1) iLnH = iY;
+        });
+        $Li.tsort({ order: 'asc', attr: 'order' }).each(function (i, el) {
+            var $El = $(el);
+            var iFr = $.data(el, 'h');
+            var iTo = i * iLnH;
+            $El.css({ position: 'absolute', top: iFr }).animate({ top: iTo }, 500);
+        });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    $( document ).ready(function() {
-        update_counts();
-        showRemaining();
     });
-    function update_counts(){
 
 
+    //update_counts queries the API to get the latest counts and update the elements as needed.
+    function update_counts() {
         $.ajax({
             type: "POST",
             url: "/challenges/view_challenge/{{challenge_id}}",
             contentType: "application/json; charset=utf-8",
             success: function (data) {
-                new_html=''
-                total_completed=0
-                user_count=0
-                data.counts.forEach(function(element){
-                        console.log(element)
-                        new_html=new_html+'<li class="collection-item"><span class="ordinal">'+element.order+'</span><img src="/static/avatars/'+element.avatar_src+'" alt=""class="margin-lr-10-16 circle tiny-avatar">'+ element.display_name +' <span class="secondary-content contrib-pill">'+element.count+'</span> </li>'
-                    
-                    
-                    user_count=user_count+1
-                    
-                } 
-                );
-                $('#count-ul').html(new_html)
-                console.log(total_completed)
-               
 
-                
-       
-              
+           
+                biggest = 0 //the var is how we create the width of the track the ducks race on.
+                check_count++ // we use this to update the width of our hidden div to trigger sorting after the duck run animation finishes. 
+
+                //calculate biggest
+                data.counts.forEach(function (element) {
+                    if (element.count > biggest) {
+                        biggest = element.count
+                    }
+
+                });
+                //run the duck run animation and update counts in the pills.
+                data.counts.forEach(function (element) {
+                    if (element.count >= data.goal) {
+                        $("#only_message_" + element.display_name.replace('.', '\\.')).show()
+                    } else {
+                        $("#only_message_" + element.display_name.replace('.', '\\.')).hide()
+                    }
+                    //
+                    user_percent_complete = (element.count / biggest) * 100;
+                    if (user_percent_complete > 100) {
+                        user_percent_complete = 100
+                    }
+                    user_width = `${Math.floor(user_percent_complete)}%`
+
+                    $("#li_" + element.display_name.replace('.', '\\.')).attr("count", element.count);
+                    $("#li_" + element.display_name.replace('.', '\\.')).attr("order", element.order_num);
+                    $("#pill_text_" + element.display_name.replace('.', '\\.')).text(element.count)
+                    $("#prog_" + element.display_name.replace('.', '\\.')).css("width", user_width)
+                    $("#order_" + element.display_name.replace('.', '\\.')).text(element.order)
+                });
+                //this will trigger the sort
+                $("#prog").css("width", check_count + `px`);
 
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -118,23 +147,24 @@
                 console.log(textStatus)
                 console.log(errorThrown)
             }
-            
+
         });
 
     }
 
-    $( document ).ready(function() {
+    $(document).ready(function () {
         update_counts()
-        setInterval(function(){ 
-          update_counts()
-            
+        showRemaining()
+        setInterval(function () {
+            update_counts()
+
         }, 5000);
-        setInterval(function(){ 
+        setInterval(function () {
             showRemaining()
-              
-          }, 1000);
+
+        }, 1000);
     });
 
 
-    
+
 </script>

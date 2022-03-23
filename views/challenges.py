@@ -372,7 +372,7 @@ def view_challenge(challenge_id):
             order=1
             for count in challenge_counts:
                 if this_challenge[0].type=="competitive":
-                    counts.append({'order':ordinal(order),'display_name':count[1].display_name,'avatar_src':count[1].avatar_src,'count':count[0].count})
+                    counts.append({'order_num':order,'order':ordinal(order),'display_name':count[1].display_name,'avatar_src':count[1].avatar_src,'count':count[0].count})
                     order+=1
                 else:
                     counts.append({'display_name':count[1].display_name,'avatar_src':count[1].avatar_src,'count':count[0].count})
