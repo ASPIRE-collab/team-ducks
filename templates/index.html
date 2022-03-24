@@ -18,6 +18,7 @@
     {% endif %}
     <li><a class="dropdown-text" href="https://aspire.unm.edu/">Aspire</a></li>
     <li><a class="dropdown-text" href="https://www.zooniverse.org/projects/rowan-aspire/drones-for-ducks">zooniverse</a>
+    <li><a class="dropdown-text" id="join_us">Create Account</a>
     </li>
   </ul>
   <ul id="links-admin-dropdown" class="dropdown-content dropdown-top">
@@ -75,6 +76,7 @@
           </div>
           <div class="card-action right-align">
             <a type="create" id="create_button" class=" btn-flat grey-text waves-effect waves-light">Create an Account</a>
+           
             <a type="reset" id="reset_button" class=" btn-flat grey-text waves-effect waves-light">Reset Password</a>
             
             <button type="submit" class="green waves-effect waves-light btn-small" value="Login">Login</button>
@@ -112,6 +114,7 @@
       <div class="col s1"></div>
       <div class="col s10">
         <h4 class="grey-title">create an account</h4>
+        <div class="center">An e-mail will be sent to the address you provide with password creation instructions.</div>
         <form action='/admin/account_request' method='POST'>
           <div class="card-content">
             <div class="row input-field">
@@ -153,8 +156,8 @@
     })
   
 
-    //hide the login modal and show the reset password modal
-    $('#create_button').click(function () {
+    //hide the login modal and show the create account modal
+    $('#create_button,#join_us').click(function () {
       login_modal = M.Modal.getInstance($('#login-modal'));
       login_modal.close();
       reset_modal = M.Modal.getInstance($('#reset-pass-modal'));
