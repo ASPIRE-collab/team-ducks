@@ -3,69 +3,92 @@
 <script src="/static/js/jquery.tinysort.min.js"> </script>
 <div class="row p_top_60">
     <div class="col s2 "></div>
-
-
-
     <div class="col s8  ">
-
-
         <div class="center">
             <img style="width:200px" src="/static/images/3ducks-coop-holding-hands.svg">
         </div>
-
-        <ul  class="collection">
-            <li class="collection-item collection-top"><span class="collection-top"><span class="challenge-title">Team Goal:</span><span id="total-goal-number">{{goal_number * counts|count}}</span> </span> <span class="challenge-title time-remaining" >Remaining Time:</span> <span id="countdown"></span>
+        <ul class="collection">
+            <li class="collection-item collection-top"><span class="collection-top"><span class="challenge-title">Team
+                        Goal:</span><span id="total-goal-number">{{goal_number * counts|count}}</span> </span> <span
+                    class="challenge-title time-remaining">Remaining Time In Challenge:</span> <span
+                    id="countdown"></span>
             </li>
         </ul>
-
         <div id="progdiv" class="progress">
             <div id="prog" class="determinate" style="width: 0%"></div>
         </div>
         <ul id="count-ul" class="collection">
-
-
-
             {% for count in counts %}
-
-            <li id="li_{{ count.display_name }}" class="collection-item width-100-pct" count="{{count.count}}"><img src="/static/avatars/{{count.avatar_src}}" alt=""
-                    class="circle tiny-avatar"> {{ count.display_name }}   <span id="only_message_{{ count.display_name }}"  style="display:none;" class="only-count" >(Only {{goal_number}} will count toward the team goal.)</span>  <span id="pill_text_{{ count.display_name }}" class="secondary-content contrib-pill">{{
-                    count.count }} of {{goal_number}}</span> 
-                    <div id="progdiv" class="progress progress_user" style="height:50px;" ><div id="prog_{{ count.display_name }}" class="determinate determinate_user" style="height:50px;width:0"><img id="running_{{ count.display_name }}" style="width: 40px;float: right;" src="/static/images/duck_running_1.svg" alt="running"><img id="winning_{{ count.display_name }}" style="width: 40px;float: right;display:none" src="/static/images/duck_winning_1.svg" alt="running"></div></div>
-                </li>
-
-  
-  
-
+            <li id="li_{{ count.display_name }}" class="collection-item width-100-pct" count="{{count.count}}"><img
+                    src="/static/avatars/{{count.avatar_src}}" alt="" class="circle tiny-avatar"> {{ count.display_name
+                }} <span id="only_message_{{ count.display_name }}" style="display:none;" class="only-count">(Only
+                    {{goal_number}} will count toward the team goal.)</span> <span
+                    id="pill_text_{{ count.display_name }}" class="secondary-content contrib-pill">{{
+                    count.count }} of {{goal_number}}</span>
+                <div id="progdiv" class="progress progress_user" style="height:50px;">
+                    <div id="prog_{{ count.display_name }}" class="determinate ducktransition determinate_user"
+                        style="height:50px;width:0">
+                        <img class="running_duck" style="display:none;width: 40px;float: right;"
+                            src="/static/images/duck-run.gif" alt="">
+                        <img class="standing_duck" id="running_{{ count.display_name }}"
+                            style="width: 40px;float: right;" src="/static/images/duck_running_1.svg" alt="running">
+                        <img id="winning_{{ count.display_name }}" style="width: 40px;float: right;display:none"
+                            src="/static/images/duck_winning_1.svg" alt="running">
+                    </div>
+                </div>
+            </li>
             {% endfor %}
-
-
         </ul>
     </div>
     <div class="col s2 "></div>
 </div>
 <script>
-    goal_number=parseInt("{{goal_number}}")
+
+
+
+    $('.ducktransition').parent().bind('transitionstart', function () {
+        $(".standing_duck").hide()
+        $(".running_duck").show()
+    });
+    $('.ducktransition').parent().bind('transitionend', function () {
+        $(".running_duck").hide()
+        var this_ul = $('ul#count-ul');
+        var iLnH;
+        var this_li = $('ul#count-ul>li');
+        this_li.each(function (i, el) {
+            elm_count = el.getAttribute('count')
+            elm_id = el.id.substring(3);
+            if (elm_count >= goal_number) {
+                $("#running_" + elm_id.replace('.', '\\.')).hide()
+                $("#winning_" + elm_id.replace('.', '\\.')).show()
+
+            } else {
+                $("#winning_" + elm_id.replace('.', '\\.')).hide()
+                $("#running_" + elm_id.replace('.', '\\.')).show()
+            }
+        });
+    });
+
+    goal_number = parseInt("{{goal_number}}")
     var percent_complete
-    console.log('{{end}}')
     var end = new Date('{{end}} UTC');
-    console.log(end)
     var _second = 1000;
     var _minute = _second * 60;
     var _hour = _minute * 60;
     var _day = _hour * 24;
     var timer;
-    confetti_not_sent=true
+    confetti_not_sent = true
     function showRemaining() {
-        
-        if (percent_complete==undefined){
+        console.log(percent_complete)
+        if (percent_complete == undefined) {
             document.getElementById('countdown').innerHTML = 'Checking Status...';
             return;
         }
-        if (percent_complete==100){
+        if (percent_complete == 100) {
             document.getElementById('countdown').innerHTML = '<span style="color:green;font-weight: bold;">Challenge Success!</span>';
-            if (confetti_not_sent){
+            if (confetti_not_sent) {
                 confetti();
-                confetti_not_sent=false
+                confetti_not_sent = false
             }
             return;
         }
@@ -74,15 +97,15 @@
         if (distance < 0) {
 
             clearInterval(timer);
-            if (percent_complete==100){
+            if (percent_complete == 100) {
                 document.getElementById('countdown').innerHTML = '<span style="color:green;font-weight: bold;">Challenge Success!</span>';
-                if (confetti_not_sent){
+                if (confetti_not_sent) {
                     confetti();
-                    confetti_not_sent=false
+                    confetti_not_sent = false
                 }
                 return;
-            }else{
-                document.getElementById('countdown').innerHTML = 'Expired';
+            } else {
+                document.getElementById('countdown').innerHTML = 'Challenge Has Ended.';
                 return;
             }
 
@@ -106,84 +129,42 @@
         const date = Date.now();
         let currentDate = null;
         do {
-          currentDate = Date.now();
+            currentDate = Date.now();
         } while (currentDate - date < milliseconds);
-      }
+    }
 
 
 
 
-      const transition = document.querySelector('.determinate');
-
-      transition.addEventListener('transitionend', () => {
-      
-
-        var $Ul = $('ul#count-ul');
-        
-        $Ul.css({position:'relative',height:$Ul.height(),display:'block'});
+    const transition = document.querySelector('.determinate');
+    transition.addEventListener('transitionend', () => {
+        var this_ul = $('ul#count-ul');
+        this_ul.css({ position: 'relative', height: this_ul.height(), display: 'block' });
         var iLnH;
-        var $Li = $('ul#count-ul>li');
-        $Li.each(function(i,el){
-            elm_count=el.getAttribute('count')
-            elm_id=el.id.substring(3);
-            console.log(elm_count)
-            console.log(elm_id)
-
-            if (elm_count>=goal_number){
-                $("#running_"+elm_id.replace('.', '\\.')).hide()
-                $("#winning_"+elm_id.replace('.', '\\.')).show()
-            }else{
-                $("#winning_"+elm_id.replace('.', '\\.')).hide()
-                $("#running_"+elm_id.replace('.', '\\.')).show()
+        var this_li = $('ul#count-ul>li');
+        this_li.each(function (i, el) {
+            elm_count = el.getAttribute('count')
+            elm_id = el.id.substring(3);
+            if (elm_count >= goal_number) {
+                $("#running_" + elm_id.replace('.', '\\.')).hide()
+                $("#winning_" + elm_id.replace('.', '\\.')).show()
+                $(".standing_duck").hide()
+            } else {
+                $("#winning_" + elm_id.replace('.', '\\.')).hide()
+                $("#running_" + elm_id.replace('.', '\\.')).show()
             }
-
-
             var iY = $(el).position().top;
-            $.data(el,'h',iY);
-            if (i===1) iLnH = iY;
+            $.data(el, 'h', iY);
+            if (i === 1) iLnH = iY;
         });
-        $Li.tsort({order:'desc',attr:'count'}).each(function(i,el){
-            var $El = $(el);
-            var iFr = $.data(el,'h');
-            var iTo = i*iLnH;
-            $El.css({position:'absolute',top:iFr}).animate({top:iTo},500);
-        });
-
-      /*  var ul = document.getElementById('count-ul')
-        ,lis = ul.querySelectorAll('li')
-        ,liHeight = lis[0].offsetHeight;
-
-
-        ul.style.height = ul.offsetHeight+'px';
-        for (var i= 0,l=lis.length;i<l;i++) {
-            var li = lis[i];
-            li.style.position = 'absolute';
-            li.style.top = i*liHeight+'px';
-        }
-        
-        tinysort('ul#count-ul>li',{attr:'count',order:'desc'}).forEach(function(elm,i){
-            setTimeout((function(elm,i){
-                elm.style.top = i*liHeight+'px';
-            }).bind(null,elm,i),40);
-        });
-
-        tinysort('ul#count-ul>li',{attr:'count',order:'desc'}).forEach(function(elm,i){
-            elm.animate({
-                top:i*liHeight+'px'
-              }, 500, function() {
-                // Animation complete.
-              });
-
-        });*/
-      });
+    });
 
 
 
-    $( document ).ready(function() {
-       // update_counts();
+    $(document).ready(function () {
         showRemaining();
     });
-    function update_counts(){
+    function update_counts() {
 
 
         $.ajax({
@@ -191,50 +172,40 @@
             url: "/challenges/view_challenge/{{challenge_id}}",
             contentType: "application/json; charset=utf-8",
             success: function (data) {
-                new_html=''
-                total_completed=0
-                user_count=0
+                new_html = ''
+                total_completed = 0
+                user_count = 0
 
 
-                
-                data.counts.forEach(function(element){
-                    if (element.count>=data.goal){
-                        $("#only_message_"+element.display_name.replace('.', '\\.')).show()
-                        //$("#running_"+element.display_name.replace('.', '\\.')).hide()
-                       // $("#winning_"+element.display_name.replace('.', '\\.')).show()
-                        total_completed=total_completed+data.goal
-                    }else{
-                        $("#only_message_"+element.display_name.replace('.', '\\.')).hide()
-                       // $("#winning_"+element.display_name.replace('.', '\\.')).hide()
-                        //$("#running_"+element.display_name.replace('.', '\\.')).show()
-                        total_completed=total_completed+element.count
+
+                data.counts.forEach(function (element) {
+                    if (element.count >= data.goal) {
+                        $("#only_message_" + element.display_name.replace('.', '\\.')).show()
+                        total_completed = total_completed + data.goal
+                    } else {
+                        $("#only_message_" + element.display_name.replace('.', '\\.')).hide()
+                        total_completed = total_completed + element.count
                     }
-                    
-                    console.log("##pill_text_"+element.display_name.replace('.', '\\.'))
-                    console.log($("#pill_text_"+element.display_name.replace('.', '\\.')).text())
-                    
+
                     user_percent_complete = (element.count / data.goal) * 100;
-                    if(user_percent_complete>100){
-                        user_percent_complete=100
+                    if (user_percent_complete > 100) {
+                        user_percent_complete = 100
                     }
-                    user_width=`${Math.floor(user_percent_complete)}%`
-                    $("#li_"+element.display_name.replace('.', '\\.')).attr("count", element.count);
-                    
-                    $("#pill_text_"+element.display_name.replace('.', '\\.')).text(element.count+' of '+goal_number)
-                    $("#prog_"+element.display_name.replace('.', '\\.')).css("width",user_width)
+                    user_width = `${Math.floor(user_percent_complete)}%`
+                    $("#li_" + element.display_name.replace('.', '\\.')).attr("count", element.count);
 
-                    //static/images/duck_winning_1.svg
+                    $("#pill_text_" + element.display_name.replace('.', '\\.')).text(element.count + ' of ' + goal_number)
+                    $("#prog_" + element.display_name.replace('.', '\\.')).css("width", user_width)
 
+                    user_count = user_count + 1
 
-                    user_count=user_count+1
-                    
                 });
 
 
                 $('#total-goal-number').text(data.goal * user_count)
 
                 percent_complete = (total_completed / (data.goal * user_count)) * 100;
-  
+
                 $("#prog").css("width", `${Math.floor(percent_complete)}%`);
 
             },
@@ -243,23 +214,23 @@
                 console.log(textStatus)
                 console.log(errorThrown)
             }
-            
+
         });
 
     }
 
-    $( document ).ready(function() {
+    $(document).ready(function () {
         update_counts()
-        setInterval(function(){ 
-          update_counts()
-            
+        setInterval(function () {
+            update_counts()
+
         }, 5000);
-        setInterval(function(){ 
+        setInterval(function () {
             showRemaining()
-              
-          }, 1000);
+
+        }, 1000);
     });
 
 
-    
+
 </script>
