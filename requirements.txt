@@ -14,7 +14,7 @@ Jinja2==3.0.3
 MarkupSafe==2.0.1
 panoptes-client==1.4.0
 pycparser==2.21
-PyMySQL==1.0.2
+PyMySQL==1.1.1
 python-magic==0.4.24
 redo==2.0.4
 requests>=2.31.0
